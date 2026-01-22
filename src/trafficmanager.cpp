@@ -39,6 +39,13 @@
 #include "random_utils.hpp" 
 #include "vc.hpp"
 #include "packet_reply_info.hpp"
+// Pramit modified starts
+#include <fstream>
+#include <iostream>
+#include <string>
+#include "nlohmann/json.hpp"
+using json = nlohmann::json;
+// Pramit modified ends
 
 TrafficManager * TrafficManager::New(Configuration const & config,
                                      vector<Network *> const & net)
@@ -582,7 +589,28 @@ TrafficManager::TrafficManager( const Configuration &config, const vector<Networ
     _slowest_flit.resize(_classes, -1);
     _slowest_packet.resize(_classes, -1);
 
- 
+    //Pramit modified starts
+    sim_mode = config.GetStr("sim_mode");
+    if (sim_mode == "trace") {
+        std::cout << std::string(50, '=') <<std::endl<<"Simulation mode: " <<sim_mode <<std::endl<<std::string(50, '=')<< std::endl;
+        string trace_file_name = config.GetStr("trace_file");
+        ifstream infile(trace_file_name);
+        if (!infile.is_open()) {
+            cerr << "Error: Unable to open trace file: " << trace_file_name << endl;
+            exit(1);
+        }
+        // json trace_json;
+        // infile >> trace_json;
+        // for (const auto& event : trace_json["events"]) {
+        //     int time = event["time"];
+        //     int src = event["src"];
+        //     int dest = event["dest"];
+        //     int size = event["size"];
+        //     _trace_events.push_back({time, src, dest, size});
+        // }
+        // infile.close();
+    }
+    //Pramit modified ends
 
 }
 

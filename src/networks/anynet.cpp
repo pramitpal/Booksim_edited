@@ -55,9 +55,17 @@
 #include <sstream>
 #include <limits>
 #include <algorithm>
+// Pramit modified starts
+#include <iostream>
+#include <iomanip>   // for setw, left
+#include <sstream>   // for ostringstream
+#include "../nlohmann/json.hpp"
+using json = nlohmann::json;
+
 //this is a hack, I can't easily get the routing talbe out of the network
 map<int, int>* global_routing_table;
-
+map<int, int>* global_custom_routing_table;
+// Pramit modified ends
 AnyNet::AnyNet( const Configuration &config, const string & name )
   :  Network( config, name ){
 
@@ -243,10 +251,33 @@ void min_anynet( const Router *r, const Flit *f, int in_channel,
 void AnyNet::buildRoutingTable(){
   cout<<"========================== Routing table  =====================\n";  
   routing_table.resize(_size);
+  
   for(int i = 0; i<_size; i++){
     route(i);
   }
   global_routing_table = &routing_table[0];
+  // Pramit modified starts
+  // Header
+  cout << left << setw(10) << "Router" << "Destinations → Ports (dest:port)" << endl;
+  cout << string(70, '-') << endl;
+
+  for(int r = 0; r < _size; ++r) {
+    if(routing_table[r].empty()) {
+      cout << left << setw(10) << ("[" + to_string(r) + "]") << "[no entries]" << endl;
+    } else {
+      ostringstream destPortList;
+      bool first = true;
+      for(const auto& [dest, port] : routing_table[r]) {
+        if (!first) destPortList << ", ";
+        destPortList << dest << ":" << port;
+        first = false;
+      }
+      cout << left << setw(10) << ("[" + to_string(r) + "]") << destPortList.str() << endl;
+    }
+  }
+
+  cout << string(70, '=') << endl;
+  // Pramit modified ends
 }
 
 

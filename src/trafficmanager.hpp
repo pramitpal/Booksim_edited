@@ -85,7 +85,9 @@ protected:
 
   vector<TrafficPattern *> _traffic_pattern;
   vector<InjectionProcess *> _injection_process;
-
+  // Pramit modified starts
+  string sim_mode;
+  // Pramit modified ends
   // ============ Message priorities ============ 
 
   enum ePriority { class_based, age_based, network_age_based, local_age_based, queue_length_based, hop_count_based, sequence_based, none };

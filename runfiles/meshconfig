@@ -82,5 +82,6 @@ traffic       = uniform;
 
 injection_rate = 0.2;
 
-
-
+sim_mode = trace;
+trace_file = trace_file.txt;
+routing_table_file = routing_table.json;

@@ -77,7 +77,11 @@ BookSimConfig::BookSimConfig( )
   //========================================================
   // Router options
   //========================================================
-
+  // Pramit modified starts
+  AddStrField( "sim_mode", "" );
+  AddStrField( "trace_file", "" );
+  AddStrField( "routing_table_file", "" );
+  // Pramit modified ends
   //==== General options ===================================
 
   AddStrField( "router", "iq" ); 

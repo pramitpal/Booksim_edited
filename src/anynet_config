@@ -1,0 +1,30 @@
+
+topology = anynet;
+
+
+routing_function = min;
+network_file = anynet_file;
+traffic = uniform;
+
+use_read_write = 0;
+
+sample_period = 10000;
+injection_rate = 0.01;
+
+
+vc_allocator = separable_input_first; 
+sw_allocator = separable_input_first;
+alloc_iters  = 1;
+
+num_vcs     = 1;
+vc_buf_size = 3;
+
+sim_power = 1; //fixed
+
+tech_file = techfile.txt; //change accordingly 
+
+channel_width = 128;
+
+//sim_mode = trace;
+//trace_file = trace_file.txt;
+//routing_table_file = routing_table.json;

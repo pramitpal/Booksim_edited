@@ -45,6 +45,9 @@ class AnyNet : public Network {
   //stores minimal routing information from every router to every node
   //[router][dest_node]=port
   vector<map<int, int> > routing_table;
+  // Pramit modified starts
+  vector<map<int, int> > custom_routing_table;
+  // Pramit modified ends
 
   void _ComputeSize( const Configuration &config );
   void _BuildNet( const Configuration &config );
