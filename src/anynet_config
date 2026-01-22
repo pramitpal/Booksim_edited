@@ -27,4 +27,4 @@ channel_width = 128;
 
 //sim_mode = trace;
 //trace_file = trace_file.txt;
-//routing_table_file = routing_table.json;
+routing_table_file = routing_table.json;
