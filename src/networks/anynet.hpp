@@ -52,7 +52,7 @@ class AnyNet : public Network {
   void _ComputeSize( const Configuration &config );
   void _BuildNet( const Configuration &config );
   void readFile();
-  void buildRoutingTable();
+  void buildRoutingTable(const Configuration &config);
   void route(int r_start);
 
 public:

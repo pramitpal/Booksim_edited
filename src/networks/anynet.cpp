@@ -210,7 +210,7 @@ void AnyNet::_BuildNet( const Configuration &config ){
     }
   }
 
-  buildRoutingTable();
+  buildRoutingTable(config);
 
 }
 
@@ -248,7 +248,7 @@ void min_anynet( const Router *r, const Flit *f, int in_channel,
   outputs->AddRange( out_port , vcBegin, vcEnd );
 }
 
-void AnyNet::buildRoutingTable(){
+void AnyNet::buildRoutingTable(const Configuration &config){
   cout<<"========================== Routing table  =====================\n";  
   routing_table.resize(_size);
   
@@ -277,6 +277,27 @@ void AnyNet::buildRoutingTable(){
   }
 
   cout << string(70, '=') << endl;
+  ///////////////////////////////////////////////
+  custom_routing_table.resize(_size);
+  string file_name = config.GetStr("routing_table_file");
+  std::ifstream file(file_name);
+  if (!file.is_open()) {
+    std::cerr << "Could not open routing table file which is expected to be at " << file_name << std::endl;
+    return;
+  }
+  // Parse the JSON file
+  json jsonData;
+  file >> jsonData;
+  int source_id = 0;
+  for (const auto& item : jsonData) {
+    std::map<int, int> mapItem;
+    for(auto it = item.begin(); it != item.end(); ++it) {
+      // int dst_node =std::stoi(it.key());
+      int out_port = it.value();
+      std::cout << "Source Router: " << source_id << ", Destination Router: " << it.key() << ", Port: " << out_port << std::endl;
+    }
+    source_id++;
+  }
   // Pramit modified ends
 }
 
