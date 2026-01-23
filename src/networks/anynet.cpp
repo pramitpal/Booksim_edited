@@ -288,16 +288,28 @@ void AnyNet::buildRoutingTable(const Configuration &config){
   // Parse the JSON file
   json jsonData;
   file >> jsonData;
-  int source_id = 0;
-  for (const auto& item : jsonData) {
-    std::map<int, int> mapItem;
-    for(auto it = item.begin(); it != item.end(); ++it) {
-      // int dst_node =std::stoi(it.key());
-      int out_port = it.value();
-      std::cout << "Source Router: " << source_id << ", Destination Router: " << it.key() << ", Port: " << out_port << std::endl;
-    }
-    source_id++;
+
+  std::cout << "\n========================== Routing table  =====================\n";
+  std::cout << "Router    Destinations → Ports (dest:port)\n";
+  std::cout << "----------------------------------------------------------------------\n";
+
+  json table = jsonData["table"];  // or jsonData["routing_table"] for second format
+
+  for (auto& [src, destinations] : table.items()) {
+      std::cout << "[" << src << "]       ";
+      
+      bool first = true;
+      for (auto& [dst, port] : destinations.items()) {
+          if (!first) std::cout << ", ";
+          first = false;
+          
+          std::cout << dst << ":";
+          std::cout << (port.is_null() ? 0 : port.get<int>());
+      }
+      std::cout << std::endl;
   }
+
+  std::cout << "======================================================================\n";
   // Pramit modified ends
 }
 
