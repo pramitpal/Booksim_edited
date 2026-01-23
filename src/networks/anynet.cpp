@@ -272,29 +272,69 @@ void AnyNet::buildRoutingTable(const Configuration &config){
   // Parse the JSON file
   json jsonData;
   file >> jsonData;
-  int src_id, dst_id, port_id;
-  std::cout << "\n========================== Routing table  =====================\n";
-  std::cout << "Router    Destinations → Ports (dest:port)\n";
-  std::cout << "----------------------------------------------------------------------\n";
   json table = jsonData["table"];  // or jsonData["routing_table"] for second format
   for (auto& [src, destinations] : table.items()) {
-      src_id = std::stoi(src);
-      std::cout << "[" << src_id << "]       ";
       for (auto& [dst, port] : destinations.items()) {
-        dst_id = std::stoi(dst);
-        port_id = port.is_null() ? 0 : port.get<int>();
-        custom_routing_table[src_id][dst_id] = port_id;
-          std::cout << dst_id << ":";
-          std::cout << port_id<< "  ";
+        custom_routing_table[std::stoi(src)][std::stoi(dst)] = port.is_null() ? 0 : port.get<int>();
       }
-      std::cout << std::endl;
   }
-  std::cout << "======================================================================\n";
   global_custom_routing_table = &custom_routing_table[0];
+  
+  // Print as matrix: rows = src, cols = dst, cell = out_port
+  PrintRoutingMatrix(custom_routing_table, "Routing_table (src \\ dst)");
   // Pramit modified ends
 }
+//Pramit modified starts
+void PrintRoutingMatrix(const std::vector<std::map<int, int>>& routing_table,
+                        const std::string& title) {
+    if (routing_table.empty()) return;
+    int size = routing_table.size();
 
+    // Find max node ID to determine column width
+    int max_node = size - 1;
+    int max_port = 0;
+    for (const auto& router_map : routing_table) {
+        for (const auto& kv : router_map) {
+            if (kv.first > max_node) max_node = kv.first;
+            if (kv.second > max_port) max_port = kv.second;
+        }
+    }
+    int max_val = std::max(max_node, max_port);
+    int cell_width = std::to_string(max_val).length() + 1;
+    if (cell_width < 2) cell_width = 2;
 
+    int total_width = 4 + size * cell_width;
+    std::string separator(total_width, '=');
+
+    std::cout << separator << "\n" << title << "\n" << separator << "\n";
+
+    // Column headers
+    std::cout << std::setw(4) << "";
+    for (int d = 0; d < size; ++d) {
+        std::cout << std::setw(cell_width) << d;
+    }
+    std::cout << "\n";
+
+    // Rows
+    for (int s = 0; s < size; ++s) {
+        std::cout << std::setw(3) << s << " ";
+        for (int d = 0; d < size; ++d) {
+            if (s == d) {
+                std::cout << std::setw(cell_width) << "-";
+            } else {
+                auto it = routing_table[s].find(d);
+                if (it != routing_table[s].end()) {
+                    std::cout << std::setw(cell_width) << it->second;
+                } else {
+                    std::cout << std::setw(cell_width) << "?"; // unreachable
+                }
+            }
+        }
+        std::cout << "\n";
+    }
+    std::cout << separator << "\n";
+}
+// Pramit modified ends
 //11/7/2012
 //basically djistra's, tested on a large dragonfly anynet configuration
 void AnyNet::route(int r_start){

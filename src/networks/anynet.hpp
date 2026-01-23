@@ -34,7 +34,11 @@
 #include <string>
 #include <map>
 #include <list>
-
+#include <vector>
+#include <utility>
+#include <iostream>
+void PrintRoutingMatrix(const std::vector<std::map<int, int>>& routing_table,
+                        const std::string& title = "Routing Matrix (src \\ dst)");
 class AnyNet : public Network {
 
   string file_name;
