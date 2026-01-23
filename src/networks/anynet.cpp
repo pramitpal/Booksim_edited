@@ -61,9 +61,10 @@
 #include <sstream>   // for ostringstream
 #include "../nlohmann/json.hpp"
 using json = nlohmann::json;
-
+// Pramit modified ends
 //this is a hack, I can't easily get the routing talbe out of the network
 map<int, int>* global_routing_table;
+// Pramit modified starts
 map<int, int>* global_custom_routing_table;
 // Pramit modified ends
 AnyNet::AnyNet( const Configuration &config, const string & name )
@@ -219,12 +220,15 @@ void AnyNet::RegisterRoutingFunctions() {
   gRoutingFunctionMap["min_anynet"] = &min_anynet;
 }
 
-void min_anynet( const Router *r, const Flit *f, int in_channel, 
-		 OutputSet *outputs, bool inject ){
+void min_anynet( const Router *r, const Flit *f, int in_channel, OutputSet *outputs, bool inject ){
   int out_port=-1;
   if(!inject){
-    assert(global_routing_table[r->GetID()].count(f->dest)!=0);
-    out_port=global_routing_table[r->GetID()][f->dest];
+    // assert(global_routing_table[r->GetID()].count(f->dest)!=0);
+    // out_port=global_routing_table[r->GetID()][f->dest];
+    //Pramit modified starts
+    assert(global_custom_routing_table[r->GetID()].count(f->dest)!=0);
+    out_port=global_custom_routing_table[r->GetID()][f->dest];
+    //Pramit modified ends
   }
  
 
@@ -247,36 +251,16 @@ void min_anynet( const Router *r, const Flit *f, int in_channel,
 
   outputs->AddRange( out_port , vcBegin, vcEnd );
 }
-
+////////////////////////////////////////////////////
 void AnyNet::buildRoutingTable(const Configuration &config){
-  cout<<"========================== Routing table  =====================\n";  
-  routing_table.resize(_size);
+  // cout<<"========================== Routing table  =====================\n";  
+  // routing_table.resize(_size);
   
-  for(int i = 0; i<_size; i++){
-    route(i);
-  }
-  global_routing_table = &routing_table[0];
+  // for(int i = 0; i<_size; i++){
+  //   route(i);
+  // }
+  // global_routing_table = &routing_table[0];
   // Pramit modified starts
-  // Header
-  cout << left << setw(10) << "Router" << "Destinations → Ports (dest:port)" << endl;
-  cout << string(70, '-') << endl;
-
-  for(int r = 0; r < _size; ++r) {
-    if(routing_table[r].empty()) {
-      cout << left << setw(10) << ("[" + to_string(r) + "]") << "[no entries]" << endl;
-    } else {
-      ostringstream destPortList;
-      bool first = true;
-      for(const auto& [dest, port] : routing_table[r]) {
-        if (!first) destPortList << ", ";
-        destPortList << dest << ":" << port;
-        first = false;
-      }
-      cout << left << setw(10) << ("[" + to_string(r) + "]") << destPortList.str() << endl;
-    }
-  }
-
-  cout << string(70, '=') << endl;
   ///////////////////////////////////////////////
   custom_routing_table.resize(_size);
   string file_name = config.GetStr("routing_table_file");
@@ -288,28 +272,25 @@ void AnyNet::buildRoutingTable(const Configuration &config){
   // Parse the JSON file
   json jsonData;
   file >> jsonData;
-
+  int src_id, dst_id, port_id;
   std::cout << "\n========================== Routing table  =====================\n";
   std::cout << "Router    Destinations → Ports (dest:port)\n";
   std::cout << "----------------------------------------------------------------------\n";
-
   json table = jsonData["table"];  // or jsonData["routing_table"] for second format
-
   for (auto& [src, destinations] : table.items()) {
-      std::cout << "[" << src << "]       ";
-      
-      bool first = true;
+      src_id = std::stoi(src);
+      std::cout << "[" << src_id << "]       ";
       for (auto& [dst, port] : destinations.items()) {
-          if (!first) std::cout << ", ";
-          first = false;
-          
-          std::cout << dst << ":";
-          std::cout << (port.is_null() ? 0 : port.get<int>());
+        dst_id = std::stoi(dst);
+        port_id = port.is_null() ? 0 : port.get<int>();
+        custom_routing_table[src_id][dst_id] = port_id;
+          std::cout << dst_id << ":";
+          std::cout << port_id<< "  ";
       }
       std::cout << std::endl;
   }
-
   std::cout << "======================================================================\n";
+  global_custom_routing_table = &custom_routing_table[0];
   // Pramit modified ends
 }
 

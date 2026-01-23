@@ -53,6 +53,9 @@ OBJS :=  $(CPP_OBJS) $(LEX_OBJS) $(YACC_OBJS)
 .PHONY: clean
 
 all: $(PROG)
+# 	@echo "Cleaning up object files..."
+# 	@rm -f $(OBJS)
+# 	@echo "Build complete. Binary: $(PROG)"
 
 $(PROG): $(OBJS)
 	 $(CXX) $(LFLAGS) $^ -o $@
