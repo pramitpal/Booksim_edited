@@ -1,0 +1,29 @@
+{
+  "type": "default",
+  "table": {
+    "__tuple__:[\"chiplet\", 0]": {
+      "__tuple__:[\"chiplet\", 0]": null,
+      "__tuple__:[\"chiplet\", 1]": {"__tuple__": true, "items": ["chiplet", 1] },
+      "__tuple__:[\"chiplet\", 2]": {"__tuple__": true, "items": ["chiplet", 2] },
+      "__tuple__:[\"chiplet\", 3]": {"__tuple__": true, "items": ["chiplet", 1] }
+    },
+    "__tuple__:[\"chiplet\", 1]": {
+      "__tuple__:[\"chiplet\", 0]": {"__tuple__": true, "items": ["chiplet", 0] },
+      "__tuple__:[\"chiplet\", 1]": null,
+      "__tuple__:[\"chiplet\", 2]": {"__tuple__": true, "items": ["chiplet", 0] },
+      "__tuple__:[\"chiplet\", 3]": {"__tuple__": true, "items": ["chiplet", 3] }
+    },
+    "__tuple__:[\"chiplet\", 2]": {
+      "__tuple__:[\"chiplet\", 0]": {"__tuple__": true, "items": ["chiplet", 0] },
+      "__tuple__:[\"chiplet\", 1]": {"__tuple__": true, "items": ["chiplet", 0] },
+      "__tuple__:[\"chiplet\", 2]": null,
+      "__tuple__:[\"chiplet\", 3]": {"__tuple__": true, "items": ["chiplet", 3] }
+    },
+    "__tuple__:[\"chiplet\", 3]": {
+      "__tuple__:[\"chiplet\", 0]": {"__tuple__": true, "items": ["chiplet", 1] },
+      "__tuple__:[\"chiplet\", 1]": {"__tuple__": true, "items": ["chiplet", 1] },
+      "__tuple__:[\"chiplet\", 2]": {"__tuple__": true, "items": ["chiplet", 2] },
+      "__tuple__:[\"chiplet\", 3]": null
+    }
+  }
+}
