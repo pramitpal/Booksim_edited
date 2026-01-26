@@ -54,7 +54,7 @@
 #include "injection.hpp"
 #include "power_module.hpp"
 
-
+#define TRACK_FLOWS 1
 
 ///////////////////////////////////////////////////////////////////////////////
 //Global declarations

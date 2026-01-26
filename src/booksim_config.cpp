@@ -34,7 +34,7 @@
 
 #include "booksim.hpp"
 #include "booksim_config.hpp"
-
+#define TRACK_FLOWS
 BookSimConfig::BookSimConfig( )
 { 
   //========================================================

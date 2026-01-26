@@ -87,6 +87,17 @@ protected:
   vector<InjectionProcess *> _injection_process;
   // Pramit modified starts
   string sim_mode;
+  bool rc_ignore_cycles;
+  long rc_max_cycle;
+  long rc_num_packets;
+  long rc_trace_runtime;
+  map<int, priority_queue<pair<long,long>, vector<pair<long,long>>, greater<pair<long,long>>>> ready_packets;	
+  map<long, vector<long>> pkg_rev_deps;
+  map<long, int> pkg_source;
+  map<long, int> pkg_destination;
+  map<long, int> pkg_deps_left;
+  map<long, long> pkg_cycle;
+  map<long, int> pkg_flits;
   // Pramit modified ends
   // ============ Message priorities ============ 
 
@@ -267,8 +278,9 @@ protected:
   virtual void _RetireFlit( Flit *f, int dest );
 
   void _Inject();
-  void _Step( );
-
+  // void _Step( );
+  int _Step( int trace_packets_left);
+  
   bool _PacketsOutstanding( ) const;
   
   virtual int  _IssuePacket( int source, int cl );

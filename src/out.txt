@@ -1,5 +1,4 @@
 BEGIN Configuration File: anynet_config
-
 topology = anynet;
 
 
@@ -9,16 +8,34 @@ traffic = uniform;
 
 use_read_write = 0;
 
-sample_period = 10000;
-injection_rate = 0.01;
+sample_period = 10000; //check
+injection_rate = 0.01; //check
 
+
+// Constant delays
+routing_delay = 1;
+vc_alloc_delay = 1;
+sw_alloc_delay = 1;
+st_final_delay = 1;
+
+packet_size = 1; //fixed
 
 vc_allocator = separable_input_first; 
 sw_allocator = separable_input_first;
 alloc_iters  = 1;
 
-num_vcs     = 1;
-vc_buf_size = 3;
+sample_period = 100000;
+warmup_periods = 0;
+max_samples = 1;
+
+num_vcs = 3;
+
+buf_size = 10;
+vc_buf_size = 10;
+output_buffer_size = 1;
+
+private_bufs = 1;
+private_buf_size = 1;
 
 sim_power = 1; //fixed
 
@@ -26,9 +43,14 @@ tech_file = techfile.txt; //change accordingly
 
 channel_width = 128;
 
-//sim_mode = trace;
-//trace_file = trace_file.txt;
-routing_table_file = routing_table.json;;END Configuration File: anynet_config
+sim_mode = trace;
+trace_file = trace_file.json;
+routing_table_file = routing_table.json;
+viewer_trace = 1;
+print_activity = 0;
+measure_stats = 0;
+
+END Configuration File: anynet_config
 ========================Network File Parsed=================
 ******************node listing**********************
 Node 0	Router 0
@@ -90,290 +112,117 @@ Routing_table (src \ dst)
   2  1 1 - 2
   3  1 1 2 -
 ============
-Class 0:
-Packet latency average = 11.6987
-	minimum = 7
-	maximum = 19
-Network latency average = 11.6987
-	minimum = 7
-	maximum = 19
-Slowest packet = 212
-Flit latency average = 11.6987
-	minimum = 7
-	maximum = 19
-Slowest flit = 212
-Fragmentation average = 0
-	minimum = 0
-	maximum = 0
-Injected packet rate average = 0.009625
-	minimum = 0.0082 (at node 3)
-	maximum = 0.0104 (at node 0)
-Accepted packet rate average = 0.009625
-	minimum = 0.0088 (at node 1)
-	maximum = 0.0104 (at node 0)
-Injected flit rate average = 0.009625
-	minimum = 0.0082 (at node 3)
-	maximum = 0.0104 (at node 0)
-Accepted flit rate average= 0.009625
-	minimum = 0.0088 (at node 1)
-	maximum = 0.0104 (at node 0)
-Injected packet length average = 1
-Accepted packet length average = 1
-Total in-flight flits = 0 (0 measured)
-latency change    = 1
-throughput change = 1
-Class 0:
-Packet latency average = 12.0158
-	minimum = 7
-	maximum = 20
-Network latency average = 12.0158
-	minimum = 7
-	maximum = 20
-Slowest packet = 648
-Flit latency average = 12.0158
-	minimum = 7
-	maximum = 20
-Slowest flit = 648
-Fragmentation average = 0
-	minimum = 0
-	maximum = 0
-Injected packet rate average = 0.0094875
-	minimum = 0.00915 (at node 3)
-	maximum = 0.00985 (at node 2)
-Accepted packet rate average = 0.0094875
-	minimum = 0.00885 (at node 3)
-	maximum = 0.01065 (at node 0)
-Injected flit rate average = 0.0094875
-	minimum = 0.00915 (at node 3)
-	maximum = 0.00985 (at node 2)
-Accepted flit rate average= 0.0094875
-	minimum = 0.00885 (at node 3)
-	maximum = 0.01065 (at node 0)
-Injected packet length average = 1
-Accepted packet length average = 1
-Total in-flight flits = 0 (0 measured)
-latency change    = 0.026391
-throughput change = 0.0144928
-Class 0:
-Packet latency average = 11.8446
-	minimum = 7
-	maximum = 19
-Network latency average = 11.8446
-	minimum = 7
-	maximum = 19
-Slowest packet = 839
-Flit latency average = 11.8446
-	minimum = 7
-	maximum = 19
-Slowest flit = 839
-Fragmentation average = 0
-	minimum = 0
-	maximum = 0
-Injected packet rate average = 0.010025
-	minimum = 0.0087 (at node 2)
-	maximum = 0.0116 (at node 1)
-Accepted packet rate average = 0.009975
-	minimum = 0.0089 (at node 1)
-	maximum = 0.0108 (at node 3)
-Injected flit rate average = 0.010025
-	minimum = 0.0087 (at node 2)
-	maximum = 0.0116 (at node 1)
-Accepted flit rate average= 0.009975
-	minimum = 0.0089 (at node 1)
-	maximum = 0.0108 (at node 3)
-Injected packet length average = 1
-Accepted packet length average = 1
-Total in-flight flits = 2 (0 measured)
-latency change    = 0.0144537
-throughput change = 0.0488722
-Warmed up ...Time used is 30000 cycles
-Class 0:
-Packet latency average = 11.9835
-	minimum = 7
-	maximum = 18
-Network latency average = 11.9835
-	minimum = 7
-	maximum = 18
-Slowest packet = 1486
-Flit latency average = 11.9836
-	minimum = 7
-	maximum = 18
-Slowest flit = 1486
-Fragmentation average = 0
-	minimum = 0
-	maximum = 0
-Injected packet rate average = 0.0106
-	minimum = 0.0096 (at node 2)
-	maximum = 0.0116 (at node 3)
-Accepted packet rate average = 0.01065
-	minimum = 0.0099 (at node 2)
-	maximum = 0.0114 (at node 3)
-Injected flit rate average = 0.0106
-	minimum = 0.0096 (at node 2)
-	maximum = 0.0116 (at node 3)
-Accepted flit rate average= 0.01065
-	minimum = 0.0099 (at node 2)
-	maximum = 0.0114 (at node 3)
-Injected packet length average = 1
-Accepted packet length average = 1
-Total in-flight flits = 0 (0 measured)
-latency change    = 0.0115892
-throughput change = 0.0633803
-Class 0:
-Packet latency average = 12.0059
-	minimum = 7
-	maximum = 20
-Network latency average = 12.0059
-	minimum = 7
-	maximum = 20
-Slowest packet = 1865
-Flit latency average = 12.0059
-	minimum = 7
-	maximum = 20
-Slowest flit = 1865
-Fragmentation average = 0
-	minimum = 0
-	maximum = 0
-Injected packet rate average = 0.0105375
-	minimum = 0.0096 (at node 2)
-	maximum = 0.0114 (at node 3)
-Accepted packet rate average = 0.0105625
-	minimum = 0.01025 (at node 2)
-	maximum = 0.01105 (at node 3)
-Injected flit rate average = 0.0105375
-	minimum = 0.0096 (at node 2)
-	maximum = 0.0114 (at node 3)
-Accepted flit rate average= 0.0105625
-	minimum = 0.01025 (at node 2)
-	maximum = 0.01105 (at node 3)
-Injected packet length average = 1
-Accepted packet length average = 1
-Total in-flight flits = 0 (0 measured)
-latency change    = 0.00186913
-throughput change = 0.00828402
-Class 0:
-Packet latency average = 12.0359
-	minimum = 7
-	maximum = 20
-Network latency average = 12.0359
-	minimum = 7
-	maximum = 20
-Slowest packet = 1865
-Flit latency average = 12.0358
-	minimum = 7
-	maximum = 20
-Slowest flit = 1865
-Fragmentation average = 0
-	minimum = 0
-	maximum = 0
-Injected packet rate average = 0.010225
-	minimum = 0.0096 (at node 2)
-	maximum = 0.0106667 (at node 3)
-Accepted packet rate average = 0.0102417
-	minimum = 0.00963333 (at node 2)
-	maximum = 0.0112333 (at node 3)
-Injected flit rate average = 0.010225
-	minimum = 0.0096 (at node 2)
-	maximum = 0.0106667 (at node 3)
-Accepted flit rate average= 0.0102417
-	minimum = 0.00963333 (at node 2)
-	maximum = 0.0112333 (at node 3)
-Injected packet length average = 1
-Accepted packet length average = 1
-Total in-flight flits = 0 (0 measured)
-latency change    = 0.00248662
-throughput change = 0.0313263
-Class 0:
-Packet latency average = 12.0302
-	minimum = 7
-	maximum = 20
-Network latency average = 12.0302
-	minimum = 7
-	maximum = 20
-Slowest packet = 1865
-Flit latency average = 12.0301
-	minimum = 7
-	maximum = 20
-Slowest flit = 1865
-Fragmentation average = 0
-	minimum = 0
-	maximum = 0
-Injected packet rate average = 0.01015
-	minimum = 0.009375 (at node 2)
-	maximum = 0.01075 (at node 1)
-Accepted packet rate average = 0.0101625
-	minimum = 0.009825 (at node 0)
-	maximum = 0.0108 (at node 3)
-Injected flit rate average = 0.01015
-	minimum = 0.009375 (at node 2)
-	maximum = 0.01075 (at node 1)
-Accepted flit rate average= 0.0101625
-	minimum = 0.009825 (at node 0)
-	maximum = 0.0108 (at node 3)
-Injected packet length average = 1
-Accepted packet length average = 1
-Total in-flight flits = 0 (0 measured)
-latency change    = 0.000472762
-throughput change = 0.00779008
+==================================================
+Simulation mode: trace
+==================================================
+Trace Packet - ID: 0, Cycle: 0, Src: 0, Dst: 3, Num Deps: 0, Num Flits: 10
+Registered Trace Packet ID: 0
+Total Trace Packets Registered: 1
+Max Cycle so far: 0
+--------------------------------------------------
+Trace Packet - ID: 1, Cycle: 1, Src: 0, Dst: 0, Num Deps: 0, Num Flits: 0
+Registered Trace Packet ID: 1
+Total Trace Packets Registered: 2
+Max Cycle so far: 1
+--------------------------------------------------
+Cycle 0 Sample period 10 Trace packets left 2
+TIME 1
+TIME 2
+TIME 3
+TIME 4
+TIME 5
+ROUTER 0 OUTPORT 1 FLIT_ID 0 PKT_ID 0 SRC 0 DST 3 NEW 1 ABSORBED 0 AGE 5 CLASS 0
+TIME 6
+ROUTER 0 OUTPORT 1 FLIT_ID 1 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 6 CLASS 0
+TIME 7
+ROUTER 0 OUTPORT 1 FLIT_ID 2 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 7 CLASS 0
+TIME 8
+TIME 9
+TIME 10
+Warmed up ...Time used is 10 cycles
 Draining all recorded packets ...
 Draining remaining packets ...
-Time taken is 70001 cycles
+ROUTER 1 OUTPORT 2 FLIT_ID 0 PKT_ID 0 SRC 0 DST 3 NEW 1 ABSORBED 0 AGE 10 CLASS 0
+TIME 11
+ROUTER 1 OUTPORT 2 FLIT_ID 1 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 11 CLASS 0
+TIME 12
+ROUTER 0 OUTPORT 1 FLIT_ID 3 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 12 CLASS 0
+ROUTER 1 OUTPORT 2 FLIT_ID 2 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 12 CLASS 0
+TIME 13
+ROUTER 0 OUTPORT 1 FLIT_ID 4 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 13 CLASS 0
+TIME 14
+ROUTER 0 OUTPORT 1 FLIT_ID 5 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 14 CLASS 0
+TIME 15
+ROUTER 3 OUTPORT 0 FLIT_ID 0 PKT_ID 0 SRC 0 DST 3 NEW 1 ABSORBED 0 AGE 15 CLASS 0
+TIME 16
+ROUTER 3 OUTPORT 0 FLIT_ID 1 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 16 CLASS 0
+TIME 17
+ROUTER 1 OUTPORT 2 FLIT_ID 3 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 17 CLASS 0
+ROUTER 3 OUTPORT 0 FLIT_ID 2 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 17 CLASS 0
+TIME 18
+ROUTER 1 OUTPORT 2 FLIT_ID 4 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 18 CLASS 0
+TIME 19
+ROUTER 0 OUTPORT 1 FLIT_ID 6 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 19 CLASS 0
+ROUTER 1 OUTPORT 2 FLIT_ID 5 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 19 CLASS 0
+TIME 20
+ROUTER 0 OUTPORT 1 FLIT_ID 7 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 20 CLASS 0
+ROUTER 3 OUTPORT 0 FLIT_ID 3 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 20 CLASS 0
+TIME 21
+ROUTER 0 OUTPORT 1 FLIT_ID 8 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 21 CLASS 0
+ROUTER 3 OUTPORT 0 FLIT_ID 4 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 21 CLASS 0
+TIME 22
+ROUTER 1 OUTPORT 2 FLIT_ID 6 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 22 CLASS 0
+ROUTER 3 OUTPORT 0 FLIT_ID 5 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 22 CLASS 0
+TIME 23
+ROUTER 1 OUTPORT 2 FLIT_ID 7 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 23 CLASS 0
+TIME 24
+ROUTER 0 OUTPORT 1 FLIT_ID 9 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 1 AGE 24 CLASS 0
+ROUTER 1 OUTPORT 2 FLIT_ID 8 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 24 CLASS 0
+TIME 25
+ROUTER 3 OUTPORT 0 FLIT_ID 6 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 25 CLASS 0
+TIME 26
+ROUTER 3 OUTPORT 0 FLIT_ID 7 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 26 CLASS 0
+TIME 27
+ROUTER 1 OUTPORT 2 FLIT_ID 9 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 1 AGE 27 CLASS 0
+ROUTER 3 OUTPORT 0 FLIT_ID 8 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 27 CLASS 0
+TIME 28
+TIME 29
+TIME 30
+ROUTER 3 OUTPORT 0 FLIT_ID 9 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 1 AGE 30 CLASS 0
+TIME 31
+TIME 32
+TIME 33
+TIME 34
+TIME 35
+Time taken is 35 cycles
 ====== Overall Traffic Statistics ======
-====== Traffic class 0 ======
-Packet latency average = 12.0302 (1 samples)
-	minimum = 7 (1 samples)
-	maximum = 20 (1 samples)
-Network latency average = 12.0302 (1 samples)
-	minimum = 7 (1 samples)
-	maximum = 20 (1 samples)
-Flit latency average = 12.0301 (1 samples)
-	minimum = 7 (1 samples)
-	maximum = 20 (1 samples)
-Fragmentation average = 0 (1 samples)
-	minimum = 0 (1 samples)
-	maximum = 0 (1 samples)
-Injected packet rate average = 0.01015 (1 samples)
-	minimum = 0.009375 (1 samples)
-	maximum = 0.01075 (1 samples)
-Accepted packet rate average = 0.0101625 (1 samples)
-	minimum = 0.009825 (1 samples)
-	maximum = 0.0108 (1 samples)
-Injected flit rate average = 0.01015 (1 samples)
-	minimum = 0.009375 (1 samples)
-	maximum = 0.01075 (1 samples)
-Accepted flit rate average = 0.0101625 (1 samples)
-	minimum = 0.009825 (1 samples)
-	maximum = 0.0108 (1 samples)
-Injected packet size average = 1 (1 samples)
-Accepted packet size average = 1 (1 samples)
-Hops average = 1.99446 (1 samples)
-Total run time 0.0556161
+Total run time 0.00566387
 L = 2 K = 8.1 M = 2 N = 1
 -----------------------------------------
 - OCN Power Summary
-- Completion Time:         70001
+- Completion Time:         35
 - Flit Widths:            128
-- Channel Wire Power:      0.130332
+- Channel Wire Power:      1.25306
 - Channel Clock Power:     0.121188
-- Channel Retiming Power:  0.00161931
+- Channel Retiming Power:  0.0155686
 - Channel Leakage Power:   0.0456856
-- Input Read Power:        0.00158525
-- Input Write Power:       0.00158525
-- Input Leakage Power:     0.0013271
-- Switch Power:            0.00496762
-- Switch Control Power:    0.00247734
+- Input Read Power:        0.0335259
+- Input Write Power:       0.0335259
+- Input Leakage Power:     0.013271
+- Switch Power:            0.0528415
+- Switch Control Power:    0.0268453
 - Switch Leakage Power:    0.0301192
-- Output DFF Power:        0.000538763
+- Output DFF Power:        0.00583822
 - Output Clk Power:        0.0454454
-- Output Control Power:    0.000278046
-- Total Power:             0.387149
+- Output Control Power:    0.00301301
+- Total Power:             1.67993
 -----------------------------------------
 
 -----------------------------------------
 - OCN Area Summary
 - Channel Area:  0.00908067
 - Switch  Area:  0.0150995
-- Input  Area:   0.00141558
+- Input  Area:   0.0141558
 - Output  Area:  0.00125829
-- Total Area:    0.026854
+- Total Area:    0.0395942
 -----------------------------------------

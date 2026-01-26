@@ -2254,7 +2254,24 @@ void IQRouter::_SendFlits( )
 		    << " to channel at output " << output
 		    << "." << endl;
       if(gTrace) {
-	cout << "Outport " << output << endl << "Stop Mark" << endl;
+        cout << "ROUTER " << _id 
+             << " OUTPORT " << output 
+             // Identity
+             << " FLIT_ID " << f->id 
+             << " PKT_ID " << f->pid
+             // Topology flow
+             << " SRC " << f->src 
+             << " DST " << f->dest 
+             // Structure
+             << " NEW " << f->head
+             << " ABSORBED " << f->tail
+             // Stats
+             << " AGE " << (GetSimTime() - f->ctime)
+            //  << " HOPS " << f->hops
+             << " CLASS " << f->cl
+             << endl;
+            //  cout<<f<<endl;
+        // cout << Name() << " Outport " << output << endl << "Stop Mark" << endl;
       }
       _output_channels[output]->Send( f );
     }

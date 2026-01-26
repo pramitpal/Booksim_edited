@@ -591,6 +591,8 @@ TrafficManager::TrafficManager( const Configuration &config, const vector<Networ
 
     //Pramit modified starts
     sim_mode = config.GetStr("sim_mode");
+    rc_max_cycle = 0;
+	rc_num_packets = 0;
     if (sim_mode == "trace") {
         std::cout << std::string(50, '=') <<std::endl<<"Simulation mode: " <<sim_mode <<std::endl<<std::string(50, '=')<< std::endl;
         string trace_file_name = config.GetStr("trace_file");
@@ -599,16 +601,48 @@ TrafficManager::TrafficManager( const Configuration &config, const vector<Networ
             cerr << "Error: Unable to open trace file: " << trace_file_name << endl;
             exit(1);
         }
-        // json trace_json;
-        // infile >> trace_json;
-        // for (const auto& event : trace_json["events"]) {
-        //     int time = event["time"];
-        //     int src = event["src"];
-        //     int dest = event["dest"];
-        //     int size = event["size"];
+        json trace_json;
+        infile >> trace_json;
+        infile.close();
+        for (const auto& item : trace_json) {
+            long id = item["id"];
+			long cycle = item["cycle"];
+			long src = item["src"];
+			long dst = item["dst"];
+			int num_deps = item["num_deps"];
+			int num_flits = item["num_flits"];
+            vector<long> rev_deps = item["rev_deps"].get<vector<long>>();
+            std::cout << "Trace Packet - ID: " << id << ", Cycle: " << cycle << ", Src: " << src << ", Dst: " << dst << ", Num Deps: " << num_deps << ", Num Flits: " << num_flits << std::endl;
         //     _trace_events.push_back({time, src, dest, size});
-        // }
-        // infile.close();
+            // Insert into maps
+			pkg_source[id] = src;
+			pkg_destination[id] = dst;
+			pkg_deps_left[id] = num_deps;
+			pkg_cycle[id] = cycle;
+			pkg_flits[id] = num_flits;
+			pkg_rev_deps[id] = rev_deps;
+            // Update the number of packets
+			rc_num_packets++;
+			rc_max_cycle = max(rc_max_cycle, cycle);
+            std::cout << "Registered Trace Packet ID: " << id << std::endl;
+            std::cout << "Total Trace Packets Registered: " << rc_num_packets << std::endl;
+            std::cout << "Max Cycle so far: " << rc_max_cycle << std::endl;
+            std::cout << std::string(50, '-') << std::endl;
+        }
+        // Initialize the list of packets that are ready to be injected. 
+		// Insert an empty vector into each part of the map
+		for (int i = 0; i < _nodes; i++) {
+			ready_packets[i] = priority_queue<pair<long,long>, vector<pair<long,long>>, greater<pair<long,long>>>();
+		}
+		// Insert the packets without dependencies into the ready_packets map
+		for (const auto& item : pkg_deps_left) {
+			if (item.second == 0) {
+				ready_packets[pkg_source[item.first]].push(make_pair(pkg_cycle[item.first], item.first));
+			}
+		}
+        _max_samples = 1;
+		_warmup_periods = 0;
+		_sample_period = 10 * rc_max_cycle;
     }
     //Pramit modified ends
 
@@ -779,36 +813,75 @@ void TrafficManager::_RetireFlit( Flit *f, int dest )
     }
 }
 
+//Pramit modified starts
 int TrafficManager::_IssuePacket( int source, int cl )
 {
-    int result = 0;
-    if(_use_read_write[cl]){ //use read and write
-        //check queue for waiting replies.
-        //check to make sure it is on time yet
-        if (!_repliesPending[source].empty()) {
-            if(_repliesPending[source].front()->time <= _time) {
-                result = -1;
-            }
-        } else {
-      
-            //produce a packet
-            if(_injection_process[cl]->test(source)) {
-	
-                //coin toss to determine request type.
-                result = (RandomFloat() < _write_fraction[cl]) ? 2 : 1;
-	
-                _requestsOutstanding[source]++;
-            }
-        }
-    } else { //normal mode
-        result = _injection_process[cl]->test(source) ? 1 : 0;
-        _requestsOutstanding[source]++;
-    } 
-    if(result != 0) {
-        _packet_seq_no[source]++;
-    }
-    return result;
+	if (sim_mode == "trace") {
+		_requestsOutstanding[source]++;
+		_packet_seq_no[source]++;
+		return 1;
+	}
+	else{
+		int result = 0;
+		if(_use_read_write[cl]){ //use read and write
+			//check queue for waiting replies.
+			//check to make sure it is on time yet
+			if (!_repliesPending[source].empty()) {
+				if(_repliesPending[source].front()->time <= _time) {
+					result = -1;
+				}
+			} else {
+		  
+				//produce a packet
+				if(_injection_process[cl]->test(source)) {
+		
+					//coin toss to determine request type.
+					result = (RandomFloat() < _write_fraction[cl]) ? 2 : 1;
+		
+					_requestsOutstanding[source]++;
+				}
+			}
+		} else { //normal mode
+			result = _injection_process[cl]->test(source) ? 1 : 0;
+			_requestsOutstanding[source]++;
+		} 
+		if(result != 0) {
+			_packet_seq_no[source]++;
+		}
+		return result;
+	}
 }
+//Pramit modified ends
+// int TrafficManager::_IssuePacket( int source, int cl )
+// {
+//     int result = 0;
+//     if(_use_read_write[cl]){ //use read and write
+//         //check queue for waiting replies.
+//         //check to make sure it is on time yet
+//         if (!_repliesPending[source].empty()) {
+//             if(_repliesPending[source].front()->time <= _time) {
+//                 result = -1;
+//             }
+//         } else {
+      
+//             //produce a packet
+//             if(_injection_process[cl]->test(source)) {
+	
+//                 //coin toss to determine request type.
+//                 result = (RandomFloat() < _write_fraction[cl]) ? 2 : 1;
+	
+//                 _requestsOutstanding[source]++;
+//             }
+//         }
+//     } else { //normal mode
+//         result = _injection_process[cl]->test(source) ? 1 : 0;
+//         _requestsOutstanding[source]++;
+//     } 
+//     if(result != 0) {
+//         _packet_seq_no[source]++;
+//     }
+//     return result;
+// }
 
 void TrafficManager::_GeneratePacket( int source, int stype, 
                                       int cl, int time )
@@ -948,38 +1021,177 @@ void TrafficManager::_GeneratePacket( int source, int stype,
 }
 
 void TrafficManager::_Inject(){
-
     for ( int input = 0; input < _nodes; ++input ) {
         for ( int c = 0; c < _classes; ++c ) {
-            // Potentially generate packets for any (input,class)
-            // that is currently empty
+            // Potentially generate packets for any (input,class) that is currently empty
             if ( _partial_packets[input][c].empty() ) {
-                bool generated = false;
-                while( !generated && ( _qtime[input][c] <= _time ) ) {
-                    int stype = _IssuePacket( input, c );
-	  
-                    if ( stype != 0 ) { //generate a packet
-                        _GeneratePacket( input, stype, c, 
-                                         _include_queuing==1 ? 
-                                         _qtime[input][c] : _time );
-                        generated = true;
-                    }
-                    // only advance time if this is not a reply packet
-                    if(!_use_read_write[c] || (stype >= 0)){
-                        ++_qtime[input][c];
-                    }
-                }
-	
-                if ( ( _sim_state == draining ) && 
-                     ( _qtime[input][c] > _drain_time ) ) {
-                    _qdrained[input][c] = true;
-                }
+				// TODO:  Start of custom code
+				if (sim_mode == "trace") {
+					// No packet is ready to be injected
+					if (ready_packets[input].empty()) {
+						break;
+					}
+					else{
+						pair<long,long> cycle_and_pid = ready_packets[input].top();
+						long packet_cycle = cycle_and_pid.first;
+						int packet_id = cycle_and_pid.second;
+						long current_cycle = _time - _reset_time;
+						// The front-most packet
+						if ((rc_ignore_cycles == false) && (current_cycle < packet_cycle)) {
+							break;
+						}else{
+							// Remove the packet from the queue
+							ready_packets[input].pop();
+							// Call the issue function just for it's side effects
+							// This should usually say whiter or not to inject a packet
+							// For traces, this always returns 1
+							int do_inject = _IssuePacket( input, c );
+							assert(do_inject == 1);
+							// Generate the packet (this is usually done in the GeneratePacket function)
+    						Flit::FlitType packet_type = Flit::ANY_TYPE;
+							int packet_size = pkg_flits[packet_id];
+							int packet_dst = pkg_destination[packet_id];
+							// Copied from BookSim
+							if ((packet_dst < 0) || (packet_dst >= _nodes)) {
+								ostringstream err;
+								err << "Incorrect packet destination " << packet_dst;
+								Error( err.str( ) );
+							}
+							// Stuff taken from the default BookSim function
+							bool record = false;
+							if ( ( _sim_state == running ) ||
+								 ( ( _sim_state == draining ) && ( _time < _drain_time ) ) ) {
+								record = _measure_stats[c];
+							}
+							// Copied from BookSim
+							int subnetwork = ((packet_type == Flit::ANY_TYPE) ? RandomInt(_subnets-1) : _subnet[packet_type]);
+  							// Generate the flits 
+							for ( int i = 0; i < packet_size; ++i ) {
+								Flit * f  = Flit::New();
+								f->id     = _cur_id++;
+								f->pid    = packet_id;
+								f->watch  = (gWatchOut && (_flits_to_watch.count(f->id) > 0));
+								f->subnetwork = subnetwork;
+								f->src    = input;
+								f->ctime  = _time;
+								f->record = record;
+								f->cl     = c;
+								f->type = packet_type;
+								// Store the flit in the in-flight flits
+								_total_in_flight_flits[f->cl].insert(make_pair(f->id, f));
+								// Measure time in-flight
+								if(record) {
+									_measured_in_flight_flits[f->cl].insert(make_pair(f->id, f));
+								}
+								// Set header-flit flag and store destination info in header flit
+								if ( i == 0 ) { // Head flit
+									f->head = true;
+									f->dest = packet_dst;
+								} else {
+									f->head = false;
+									f->dest = -1;
+								}
+								// Copied from BookSim
+								switch( _pri_type ) {
+								case class_based:
+									f->pri = _class_priority[c];
+									assert(f->pri >= 0);
+									break;
+								case age_based:
+									f->pri = numeric_limits<int>::max() - _time;
+									assert(f->pri >= 0);
+									break;
+								case sequence_based:
+									f->pri = numeric_limits<int>::max() - _packet_seq_no[input];
+									assert(f->pri >= 0);
+									break;
+								default:
+									f->pri = 0;
+								}
+								// Set tail-flit flag
+								if ( i == ( packet_size - 1 ) ) { // Tail flit
+									f->tail = true;
+								} else {
+									f->tail = false;
+								}
+								// Set virtual channel to -1
+								f->vc  = -1;
+								// Store the flit in the partial packet queue
+								_partial_packets[input][c].push_back( f );
+							}
+								
+							// Timing and logging stuff taken from BookSim defaults
+							if(!_use_read_write[c] || (do_inject>= 0)){
+								++_qtime[input][c];
+							}
+							if ( ( _sim_state == draining ) && 
+								 ( _qtime[input][c] > _drain_time ) ) {
+								_qdrained[input][c] = true;
+							}
+						}
+					}
+				}
+				// TODO: End of custom code
+				else
+				{
+					bool generated = false;
+					while( !generated && ( _qtime[input][c] <= _time ) ) {
+						int stype = _IssuePacket( input, c );
+		  
+						if ( stype != 0 ) { //generate a packet
+							_GeneratePacket( input, stype, c, 
+											 _include_queuing==1 ? 
+											 _qtime[input][c] : _time );
+							generated = true;
+						}
+						// only advance time if this is not a reply packet
+						if(!_use_read_write[c] || (stype >= 0)){
+							++_qtime[input][c];
+						}
+					}
+		
+					if ( ( _sim_state == draining ) && 
+						 ( _qtime[input][c] > _drain_time ) ) {
+						_qdrained[input][c] = true;
+					}
+				}
             }
         }
     }
 }
+// void TrafficManager::_Inject(){
 
-void TrafficManager::_Step( )
+//     for ( int input = 0; input < _nodes; ++input ) {
+//         for ( int c = 0; c < _classes; ++c ) {
+//             // Potentially generate packets for any (input,class)
+//             // that is currently empty
+//             if ( _partial_packets[input][c].empty() ) {
+//                 bool generated = false;
+//                 while( !generated && ( _qtime[input][c] <= _time ) ) {
+//                     int stype = _IssuePacket( input, c );
+	  
+//                     if ( stype != 0 ) { //generate a packet
+//                         _GeneratePacket( input, stype, c, 
+//                                          _include_queuing==1 ? 
+//                                          _qtime[input][c] : _time );
+//                         generated = true;
+//                     }
+//                     // only advance time if this is not a reply packet
+//                     if(!_use_read_write[c] || (stype >= 0)){
+//                         ++_qtime[input][c];
+//                     }
+//                 }
+	
+//                 if ( ( _sim_state == draining ) && 
+//                      ( _qtime[input][c] > _drain_time ) ) {
+//                     _qdrained[input][c] = true;
+//                 }
+//             }
+//         }
+//     }
+// }
+
+int TrafficManager::_Step(int trace_packets_left)
 {
     bool flits_in_flight = false;
     for(int c = 0; c < _classes; ++c) {
@@ -1011,6 +1223,29 @@ void TrafficManager::_Step( )
                         ++_accepted_packets[f->cl][n];
                     }
                 }
+				// TODO: Start of custom code
+				if (sim_mode == "trace") {
+					if (f->tail) {
+						trace_packets_left--;
+						// Clear packets that depend on this one
+						long packet_id = f->pid;
+						for (size_t i = 0; i < pkg_rev_deps[packet_id].size(); i++) {
+							long dep_packet_id = pkg_rev_deps[packet_id][i];
+							int dep_packet_src = pkg_source[dep_packet_id];
+							long dep_packet_cycle = pkg_cycle[dep_packet_id];
+							pkg_deps_left[dep_packet_id] -= 1;
+							// If this was the last dependency of another packet, add the other packet to the ready queue
+							if (pkg_deps_left[dep_packet_id] < 0) {
+								cout << "ERROR: Packet " << dep_packet_id << " has negative dependencies left" << endl;
+							}
+							//assert(pkg_deps_left[dep_packet_id] >= 0);
+							if (pkg_deps_left[dep_packet_id] == 0) {
+								ready_packets[dep_packet_src].push(make_pair(dep_packet_cycle, dep_packet_id));
+							}
+						}
+					}		
+				}
+				// TODO: End of custom code
             }
 
             Credit * const c = _net[subnet]->ReadCredit( n );
@@ -1031,10 +1266,9 @@ void TrafficManager::_Step( )
         }
         _net[subnet]->ReadInputs( );
     }
-  
-    if ( !_empty_network ) {
-        _Inject();
-    }
+	if ( !_empty_network ) {
+		_Inject();
+	}
 
     for(int subnet = 0; subnet < _subnets; ++subnet) {
 
@@ -1299,11 +1533,17 @@ void TrafficManager::_Step( )
     if(gTrace){
         cout<<"TIME "<<_time<<endl;
     }
-
+	return trace_packets_left;
 }
+
   
 bool TrafficManager::_PacketsOutstanding( ) const
 {
+	// TODO: Start of custom code
+	if (sim_mode== "trace") {
+		return false;
+	}
+	// TODO: End of custom code
     for ( int c = 0; c < _classes; ++c ) {
         if ( _measure_stats[c] ) {
             if ( _measured_in_flight_flits[c].empty() ) {
@@ -1455,14 +1695,33 @@ bool TrafficManager::_SingleSim( )
            ( ( _sim_state != running ) || 
              ( converged < 3 ) ) ) {
     
-        if ( clear_last || (( ( _sim_state == warming_up ) && ( ( total_phases % 2 ) == 0 ) )) ) {
-            clear_last = false;
-            _ClearStats( );
-        }
-    
-    
-        for ( int iter = 0; iter < _sample_period; ++iter )
-            _Step( );
+
+		// TODO: Start of custom code
+		if (sim_mode == "trace") {
+			_ClearStats( );	
+			int trace_packets_left = rc_num_packets;
+			for ( int iter = 0; iter < _sample_period; ++iter ){
+				if (iter % 10000 == 0) {
+					cout << "Cycle " << iter << " Sample period " << _sample_period << " Trace packets left " << trace_packets_left << endl;
+				}
+				rc_trace_runtime = iter + 1;
+				if (trace_packets_left > 0) {
+					trace_packets_left = _Step(trace_packets_left);
+				}
+				else {
+					break;
+				}
+			}
+		}
+		// TODO: End of custom code
+		else{
+			if ( clear_last || (( ( _sim_state == warming_up ) && ( ( total_phases % 2 ) == 0 ) )) ) {
+				clear_last = false;
+				_ClearStats( );
+			}
+			for ( int iter = 0; iter < _sample_period; ++iter )
+				_Step(0);
+		}
     
         //cout << _sim_state << endl;
 
@@ -1495,13 +1754,15 @@ bool TrafficManager::_SingleSim( )
             double latency = (double)_plat_stats[c]->Sum();
             double count = (double)_plat_stats[c]->NumSamples();
       
-            map<int, Flit *>::const_iterator iter;
-            for(iter = _total_in_flight_flits[c].begin(); 
-                iter != _total_in_flight_flits[c].end(); 
-                iter++) {
-                latency += (double)(_time - iter->second->ctime);
-                count++;
-            }
+			if (sim_mode == "traffic") {
+				map<int, Flit *>::const_iterator iter;
+				for(iter = _total_in_flight_flits[c].begin(); 
+					iter != _total_in_flight_flits[c].end(); 
+					iter++) {
+					latency += (double)(_time - iter->second->ctime);
+					count++;
+				}
+			}
       
             if((lat_exc_class < 0) &&
                (_latency_thres[c] >= 0.0) &&
@@ -1581,7 +1842,7 @@ bool TrafficManager::_SingleSim( )
             cout << "Draining all recorded packets ..." << endl;
             int empty_steps = 0;
             while( _PacketsOutstanding( ) ) { 
-                _Step( ); 
+                _Step(0); 
 	
                 ++empty_steps;
 	
@@ -1600,13 +1861,15 @@ bool TrafficManager::_SingleSim( )
                         double acc_latency = _plat_stats[c]->Sum();
                         double acc_count = (double)_plat_stats[c]->NumSamples();
 	    
-                        map<int, Flit *>::const_iterator iter;
-                        for(iter = _total_in_flight_flits[c].begin(); 
-                            iter != _total_in_flight_flits[c].end(); 
-                            iter++) {
-                            acc_latency += (double)(_time - iter->second->ctime);
-                            acc_count++;
-                        }
+						if (sim_mode == "traffic") {
+							map<int, Flit *>::const_iterator iter;
+							for(iter = _total_in_flight_flits[c].begin(); 
+								iter != _total_in_flight_flits[c].end(); 
+								iter++) {
+								acc_latency += (double)(_time - iter->second->ctime);
+								acc_count++;
+							}
+						}
 	    
                         if((acc_latency / acc_count) > threshold) {
                             lat_exc_class = c;
@@ -1632,7 +1895,6 @@ bool TrafficManager::_SingleSim( )
     } else {
         cout << "Too many sample periods needed to converge" << endl;
     }
-  
     return ( converged > 0 );
 }
 
@@ -1662,6 +1924,9 @@ bool TrafficManager::Run( )
         // converge
         // draing, wait until all packets finish
         _sim_state    = warming_up;
+		if (sim_mode == "traffic") {
+			_sim_state = running;
+		}
   
         _ClearStats( );
 
@@ -1670,7 +1935,7 @@ bool TrafficManager::Run( )
             _injection_process[c]->reset();
         }
 
-        if ( !_SingleSim( ) ) {
+        if ( !_SingleSim( ) and sim_mode == "traffic") {
             cout << "Simulation unstable, ending ..." << endl;
             return false;
         }
@@ -1686,7 +1951,7 @@ bool TrafficManager::Run( )
         }
 
         while( packets_left ) { 
-            _Step( ); 
+            _Step(0); 
 
             ++empty_steps;
 
@@ -1701,7 +1966,7 @@ bool TrafficManager::Run( )
         }
         //wait until all the credits are drained as well
         while(Credit::OutStanding()!=0){
-            _Step();
+            _Step(0);
         }
         _empty_network = false;
 
@@ -1722,7 +1987,6 @@ bool TrafficManager::Run( )
   
     return true;
 }
-
 void TrafficManager::_UpdateOverallStats() {
     for ( int c = 0; c < _classes; ++c ) {
     

@@ -1,0 +1,20 @@
+[
+  {
+    "id": 0,
+    "cycle": 0,
+    "src": 0,
+    "dst": 3,
+    "num_deps": 0,
+    "num_flits": 10,
+    "rev_deps": []
+  },
+  {
+    "id": 1,
+    "cycle": 1,
+    "src": 0,
+    "dst": 0,
+    "num_deps": 0,
+    "num_flits": 0,
+    "rev_deps": []
+  }
+]

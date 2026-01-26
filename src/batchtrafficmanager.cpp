@@ -122,7 +122,7 @@ bool BatchTrafficManager::_SingleSim( )
     bool batch_complete;
     cout << "Sending batch " << batch_index + 1 << " (" << _batch_size << " packets)..." << endl;
     do {
-      _Step();
+      _Step(0);
       batch_complete = true;
       for(int i = 0; i < _nodes; ++i) {
 	if(_packet_seq_no[i] < _batch_size) {
@@ -147,7 +147,7 @@ bool BatchTrafficManager::_SingleSim( )
     }
     
     while( packets_left ) { 
-      _Step( ); 
+      _Step(0 ); 
       
       ++empty_steps;
       
