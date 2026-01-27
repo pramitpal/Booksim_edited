@@ -7,9 +7,7 @@ traffic = uniform;
 
 use_read_write = 0;
 
-sample_period = 10000; //check
 injection_rate = 0.01; //check
-
 
 // Constant delays
 routing_delay = 1;
@@ -25,7 +23,7 @@ alloc_iters  = 1;
 
 sample_period = 10;
 warmup_periods = 0;
-max_samples = 100;
+max_samples = 150;
 
 num_vcs = 4;
 
