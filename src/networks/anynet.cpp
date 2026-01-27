@@ -226,9 +226,6 @@ void AnyNet::RegisterRoutingFunctions() {
 void min_anynet( const Router *r, const Flit *f, int in_channel, OutputSet *outputs, bool inject ){
   int out_port=-1;
  
-  // cout<<"inchannel "<<in_channel<<endl;
-  bool in_transit = (in_channel>0);
-  // cout<<"travelling "<< in_transit<<endl;
   int vcBegin = 0, vcEnd = gNumVCs-1;
   if ( f->type == Flit::READ_REQUEST ) {
     vcBegin = gReadReqBeginVC;
@@ -245,38 +242,126 @@ void min_anynet( const Router *r, const Flit *f, int in_channel, OutputSet *outp
   }
   assert(((f->vc >= vcBegin) && (f->vc <= vcEnd)) || (inject && (f->vc < 0)));
   
+  cout << "=== ROUTING FUNCTION ===" << endl;
+  cout << "Router: "<< " | Flit: " << f->id << " | Pkt: " << f->pid 
+       << " | Head: " << f->head << " | Tail: " << f->tail << endl;
+  cout << "Src: " << f->src << " | Dst: " << f->dest << " | Inject: " << inject 
+       << " | In_channel: " << in_channel << " | Current VC: " << f->vc << endl;
+  
   if(inject){
-      out_port=-1;
-  }
-  // else if(r->GetID() == f->dest)
-  // {
-  //   cout<<"at dest router"<<endl;
-  // }
-  else{
-    //each class must have at least 2 vcs assigned or else xy_yx will deadlock
+      out_port = -1;
+      cout << "Action: INJECTION (out_port = -1)" << endl;
+  } else {
+    // Split VCs in half for XY and YX routing
     int const available_vcs = (vcEnd - vcBegin + 1) / 2;
     assert(available_vcs > 0);
-    // cout<< "available vcs "<<available_vcs<<endl;
-    bool x_then_y;
-    if(f->head)//new inject
-    {
-      x_then_y = (RandomInt(1) > 0);
+    
+    cout << "Available VCs per path: " << available_vcs << endl;
+    
+    bool use_xy;
+    int table_id;
+    
+    if(f->head) {
+      // New packet: randomly choose XY or YX
+      use_xy = (RandomInt(1) == 0);
+      cout << "HEAD FLIT: Randomly selecting routing -> " << (use_xy ? "XY" : "YX") << endl;
+    } else {
+      // In transit: determine from current VC
+      use_xy = (f->vc < (vcBegin + available_vcs));
+      cout << "BODY/TAIL FLIT: Using existing VC -> " << (use_xy ? "XY" : "YX") 
+           << " (VC " << f->vc << " < " << (vcBegin + available_vcs) << ")" << endl;
     }
-    else{
-      x_then_y=(f->vc < (vcBegin + available_vcs));
+    
+    // Select routing table: 0 = XY, 1 = YX
+    table_id = use_xy ? 0 : 1;
+    cout << "Table selected: " << table_id << " (" << (use_xy ? "XY" : "YX") << ")" << endl;
+    
+    // Lookup output port from selected table
+    assert((*global_routing_tables_ptr)[table_id][r->GetID()].count(f->dest) != 0);
+    out_port = (*global_routing_tables_ptr)[table_id][r->GetID()][f->dest];
+    
+    cout << "Lookup: routing_tables[" << table_id << "][" << r->GetID() 
+         << "][" << f->dest << "] = " << out_port << endl;
+    
+    // Assign VC range based on routing choice
+    int original_vcBegin = vcBegin;
+    int original_vcEnd = vcEnd;
+    
+    if(use_xy) {
+      // XY uses first half of VCs
+      vcEnd = vcBegin + available_vcs - 1;
+      cout << "XY path: Using VC range [" << vcBegin << ", " << vcEnd << "]" << endl;
+    } else {
+      // YX uses second half of VCs
+      vcBegin += available_vcs;
+      cout << "YX path: Using VC range [" << vcBegin << ", " << vcEnd << "]" << endl;
     }
-    cout<<"x_then_y "<<x_then_y<<endl;
-    //Pramit modified starts
-    assert((*global_routing_tables_ptr)[1][r->GetID()].count(f->dest)!=0);
-    out_port=(*global_routing_tables_ptr)[1][r->GetID()][f->dest];
-  //   cout<<"outport="<<out_port<<endl;
-  // cout<<"current router:"<<r->GetID()<<" dest:"<<f->dest<<endl;
-    //Pramit modified ends
+    
+    cout << "VC allocation: Original [" << original_vcBegin << ", " << original_vcEnd 
+         << "] -> Final [" << vcBegin << ", " << vcEnd << "]" << endl;
   }
-  outputs->Clear( );
   
-  outputs->AddRange( out_port , vcBegin, vcEnd );
+  cout << "Output: port=" << out_port << " | VC range=[" << vcBegin << ", " << vcEnd << "]" << endl;
+  cout << "========================" << endl << endl;
+  
+  outputs->Clear();
+  outputs->AddRange(out_port, vcBegin, vcEnd);
 }
+
+// void min_anynet( const Router *r, const Flit *f, int in_channel, OutputSet *outputs, bool inject ){
+//   int out_port=-1;
+ 
+//   // cout<<"inchannel "<<in_channel<<endl;
+//   bool in_transit = (in_channel>0);
+//   // cout<<"travelling "<< in_transit<<endl;
+//   int vcBegin = 0, vcEnd = gNumVCs-1;
+//   if ( f->type == Flit::READ_REQUEST ) {
+//     vcBegin = gReadReqBeginVC;
+//     vcEnd   = gReadReqEndVC;
+//   } else if ( f->type == Flit::WRITE_REQUEST ) {
+//     vcBegin = gWriteReqBeginVC;
+//     vcEnd   = gWriteReqEndVC;
+//   } else if ( f->type ==  Flit::READ_REPLY ) {
+//     vcBegin = gReadReplyBeginVC;
+//     vcEnd   = gReadReplyEndVC;
+//   } else if ( f->type ==  Flit::WRITE_REPLY ) {
+//     vcBegin = gWriteReplyBeginVC;
+//     vcEnd   = gWriteReplyEndVC;
+//   }
+//   assert(((f->vc >= vcBegin) && (f->vc <= vcEnd)) || (inject && (f->vc < 0)));
+  
+//   if(inject){
+//       out_port=-1;
+//   }
+//   // else if(r->GetID() == f->dest)
+//   // {
+//   //   cout<<"at dest router"<<endl;
+//   // }
+//   else{
+//     //each class must have at least 2 vcs assigned or else xy_yx will deadlock
+//     int const available_vcs = (vcEnd - vcBegin + 1) / 2;
+//     assert(available_vcs > 0);
+//     // cout<< "available vcs "<<available_vcs<<endl;
+//     bool x_then_y;
+//     if(f->head)//new inject
+//     {
+//       x_then_y = (RandomInt(1) > 0);
+//     }
+//     else{
+//       x_then_y=(f->vc < (vcBegin + available_vcs));
+//     }
+//     cout<<"x_then_y "<<x_then_y<<endl;
+//     //Pramit modified starts
+//     assert((*global_routing_tables_ptr)[0][r->GetID()].count(f->dest)!=0);
+//     out_port=(*global_routing_tables_ptr)[0][r->GetID()][f->dest];
+//   //   cout<<"outport="<<out_port<<endl;
+//   // cout<<"current router:"<<r->GetID()<<" dest:"<<f->dest<<endl;
+//     //Pramit modified ends
+//   }
+//   outputs->Clear( );
+  
+//   outputs->AddRange( out_port , vcBegin, vcEnd );
+// }
 ////////////////////////////////////////////////////
 ////////////////////////////////////////////////////
 void AnyNet::buildRoutingTable(const Configuration &config) {
@@ -325,7 +410,7 @@ void AnyNet::buildRoutingTable(const Configuration &config) {
     
     global_routing_tables_ptr = &routing_tables;
 //   // Print as matrix: rows = src, cols = dst, cell = out_port
-  PrintRoutingMatrix((*global_routing_tables_ptr)[1], "Routing_table (src \\ dst)");
+  PrintRoutingMatrix((*global_routing_tables_ptr)[0], "Routing_table (src \\ dst)");
 }
 
 

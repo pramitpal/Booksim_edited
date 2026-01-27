@@ -7,7 +7,7 @@ traffic = uniform;
 
 use_read_write = 0;
 
-injection_rate = 0.01; //check
+injection_rate = 1.0; //check
 
 // Constant delays
 routing_delay = 1;
@@ -43,7 +43,7 @@ channel_width = 128;
 sim_mode = trace;
 trace_file = trace_file.json;
 routing_table_file = routing_table.json;
-viewer_trace = 1;
+viewer_trace = 0;
 print_csv_results = 0;
 print_activity = 0;
 measure_stats = 0;

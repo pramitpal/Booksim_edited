@@ -1232,6 +1232,7 @@ int TrafficManager::_Step(int trace_packets_left)
 				if (sim_mode == "trace") {
 					if (f->tail) {
 						trace_packets_left--;
+                        cout<<"Packets left to trace: "<<trace_packets_left<<endl;
 						// Clear packets that depend on this one
 						long packet_id = f->pid;
 						for (size_t i = 0; i < pkg_rev_deps[packet_id].size(); i++) {

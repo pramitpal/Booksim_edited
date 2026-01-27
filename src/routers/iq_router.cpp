@@ -2255,21 +2255,26 @@ void IQRouter::_SendFlits( )
 		    << "." << endl;
       if(gTrace) {
         cout << "ROUTER " << _id 
-             << " OUTPORT " << output 
-             // Identity
-             << " FLIT_ID " << f->id 
-             << " PKT_ID " << f->pid
-             // Topology flow
-             << " SRC " << f->src 
-             << " DST " << f->dest 
-             // Structure
-             << " NEW " << f->head
-             << " ABSORBED " << f->tail
-             // Stats
-             << " AGE " << (GetSimTime() - f->ctime)
-            //  << " HOPS " << f->hops
-             << " CLASS " << f->cl
-             << endl;
+              << " OUTPORT " << output 
+              // Identity
+              << " FLIT_ID " << f->id 
+              << " PKT_ID " << f->pid
+              // Flit position in packet
+              << " FLIT_TYPE " << (f->head && f->tail ? "SINGLE" : 
+                                    f->head ? "HEAD" : 
+                                    f->tail ? "TAIL" : "BODY")
+              << " HEAD " << f->head
+              << " TAIL " << f->tail
+              // Topology flow
+              << " SRC " << f->src 
+              << " DST " << f->dest 
+              << " AT_DEST " << (_id == f->dest)
+              << " CUR_ROUTER " << _id
+              // Stats
+              << " AGE " << (GetSimTime() - f->ctime)
+              << " HOPS " << f->hops
+              << " CLASS " << f->cl
+              << endl;
             //  cout<<f<<endl;
         // cout << Name() << " Outport " << output << endl << "Stop Mark" << endl;
       }
