@@ -640,9 +640,14 @@ TrafficManager::TrafficManager( const Configuration &config, const vector<Networ
 				ready_packets[pkg_source[item.first]].push(make_pair(pkg_cycle[item.first], item.first));
 			}
 		}
-        _max_samples = 1;
-		_warmup_periods = 0;
-		_sample_period = 10 * rc_max_cycle;
+        // _max_samples = 1;
+        // _max_samples= rc_num_packets;
+		// _warmup_periods = 0;
+		// _sample_period = 100 * rc_max_cycle;
+        cout<<"rc max cycle:"<<rc_max_cycle<<endl;
+        // if(rc_max_cycle == 0) rc_max_cycle = 100; // safety
+        
+        // _sample_period = 10 * rc_max_cycle; 
     }
     //Pramit modified ends
 
@@ -1723,7 +1728,7 @@ bool TrafficManager::_SingleSim( )
 				_Step(0);
 		}
     
-        //cout << _sim_state << endl;
+        cout << "sim_state="<<_sim_state << endl;
 
         UpdateStats();
         DisplayStats();
@@ -1813,10 +1818,9 @@ bool TrafficManager::_SingleSim( )
         }
     
         if ( _sim_state == warming_up ) {
-            if ( ( _warmup_periods > 0 ) ? 
-                 ( total_phases + 1 >= _warmup_periods ) :
-                 ( ( !_measure_latency || ( lat_chg_exc_class < 0 ) ) &&
-                   ( acc_chg_exc_class < 0 ) ) ) {
+            cout<<"warmup periods:"<<_warmup_periods<<endl;
+            cout<<"total_phases:"<<total_phases<<endl;
+            if ( ( _warmup_periods > 0 ) ? ( total_phases + 1 >= _warmup_periods ) : ( ( !_measure_latency || ( lat_chg_exc_class < 0 ) ) && ( acc_chg_exc_class < 0 ) ) ) {
                 cout << "Warmed up ..." <<  "Time used is " << _time << " cycles" <<endl;
                 clear_last = true;
                 _sim_state = running;

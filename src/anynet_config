@@ -23,11 +23,11 @@ vc_allocator = separable_input_first;
 sw_allocator = separable_input_first;
 alloc_iters  = 1;
 
-sample_period = 100000;
+sample_period = 10;
 warmup_periods = 0;
-max_samples = 1;
+max_samples = 100;
 
-num_vcs = 3;
+num_vcs = 4;
 
 buf_size = 10;
 vc_buf_size = 10;
@@ -46,5 +46,6 @@ sim_mode = trace;
 trace_file = trace_file.json;
 routing_table_file = routing_table.json;
 viewer_trace = 1;
+print_csv_results = 0;
 print_activity = 0;
 measure_stats = 0;

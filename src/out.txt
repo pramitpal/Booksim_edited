@@ -24,11 +24,11 @@ vc_allocator = separable_input_first;
 sw_allocator = separable_input_first;
 alloc_iters  = 1;
 
-sample_period = 100000;
+sample_period = 10;
 warmup_periods = 0;
-max_samples = 1;
+max_samples = 100;
 
-num_vcs = 3;
+num_vcs = 4;
 
 buf_size = 10;
 vc_buf_size = 10;
@@ -47,6 +47,7 @@ sim_mode = trace;
 trace_file = trace_file.json;
 routing_table_file = routing_table.json;
 viewer_trace = 1;
+print_csv_results = 0;
 print_activity = 0;
 measure_stats = 0;
 
@@ -57,6 +58,11 @@ Node 0	Router 0
 Node 1	Router 1
 Node 2	Router 2
 Node 3	Router 3
+Node 4	Router 4
+Node 5	Router 5
+Node 6	Router 6
+Node 7	Router 7
+Node 8	Router 8
 
 ****************router to node listing*************
 Router 0
@@ -67,162 +73,369 @@ Router 2
 	 Node 2 lat 1
 Router 3
 	 Node 3 lat 1
+Router 4
+	 Node 4 lat 1
+Router 5
+	 Node 5 lat 1
+Router 6
+	 Node 6 lat 1
+Router 7
+	 Node 7 lat 1
+Router 8
+	 Node 8 lat 1
 
 *****************router to router listing************
 Router 0
 	 Router 1 lat 1
-	 Router 2 lat 1
+	 Router 3 lat 1
 Router 1
 	 Router 0 lat 1
-	 Router 3 lat 1
-Router 2
-	 Router 0 lat 1
-	 Router 3 lat 1
-Router 3
-	 Router 1 lat 1
 	 Router 2 lat 1
+	 Router 4 lat 1
+Router 2
+	 Router 1 lat 1
+	 Router 5 lat 1
+Router 3
+	 Router 0 lat 1
+	 Router 4 lat 1
+	 Router 6 lat 1
+Router 4
+	 Router 1 lat 1
+	 Router 3 lat 1
+	 Router 5 lat 1
+	 Router 7 lat 1
+Router 5
+	 Router 2 lat 1
+	 Router 4 lat 1
+	 Router 8 lat 1
+Router 6
+	 Router 3 lat 1
+	 Router 7 lat 1
+Router 7
+	 Router 4 lat 1
+	 Router 6 lat 1
+	 Router 8 lat 1
+Router 8
+	 Router 5 lat 1
+	 Router 7 lat 1
 ==========================Node to Router =====================
 router 0 radix 3
 	 connected to node 0 at outport 0 lat 1
-router 1 radix 3
+router 1 radix 4
 	 connected to node 1 at outport 0 lat 1
 router 2 radix 3
 	 connected to node 2 at outport 0 lat 1
-router 3 radix 3
+router 3 radix 4
 	 connected to node 3 at outport 0 lat 1
+router 4 radix 5
+	 connected to node 4 at outport 0 lat 1
+router 5 radix 4
+	 connected to node 5 at outport 0 lat 1
+router 6 radix 3
+	 connected to node 6 at outport 0 lat 1
+router 7 radix 4
+	 connected to node 7 at outport 0 lat 1
+router 8 radix 3
+	 connected to node 8 at outport 0 lat 1
 ==========================Router to Router =====================
 router 0
 	 connected to router 1 using link 0 at outport 1 lat 1
-	 connected to router 2 using link 1 at outport 2 lat 1
+	 connected to router 3 using link 1 at outport 2 lat 1
 router 1
 	 connected to router 0 using link 2 at outport 1 lat 1
-	 connected to router 3 using link 3 at outport 2 lat 1
+	 connected to router 2 using link 3 at outport 2 lat 1
+	 connected to router 4 using link 4 at outport 3 lat 1
 router 2
-	 connected to router 0 using link 4 at outport 1 lat 1
-	 connected to router 3 using link 5 at outport 2 lat 1
+	 connected to router 1 using link 5 at outport 1 lat 1
+	 connected to router 5 using link 6 at outport 2 lat 1
 router 3
-	 connected to router 1 using link 6 at outport 1 lat 1
-	 connected to router 2 using link 7 at outport 2 lat 1
-============
+	 connected to router 0 using link 7 at outport 1 lat 1
+	 connected to router 4 using link 8 at outport 2 lat 1
+	 connected to router 6 using link 9 at outport 3 lat 1
+router 4
+	 connected to router 1 using link 10 at outport 1 lat 1
+	 connected to router 3 using link 11 at outport 2 lat 1
+	 connected to router 5 using link 12 at outport 3 lat 1
+	 connected to router 7 using link 13 at outport 4 lat 1
+router 5
+	 connected to router 2 using link 14 at outport 1 lat 1
+	 connected to router 4 using link 15 at outport 2 lat 1
+	 connected to router 8 using link 16 at outport 3 lat 1
+router 6
+	 connected to router 3 using link 17 at outport 1 lat 1
+	 connected to router 7 using link 18 at outport 2 lat 1
+router 7
+	 connected to router 4 using link 19 at outport 1 lat 1
+	 connected to router 6 using link 20 at outport 2 lat 1
+	 connected to router 8 using link 21 at outport 3 lat 1
+router 8
+	 connected to router 5 using link 22 at outport 1 lat 1
+	 connected to router 7 using link 23 at outport 2 lat 1
+Loaded: xy_table
+Loaded: yx_table
+======================
 Routing_table (src \ dst)
-============
-     0 1 2 3
-  0  - 1 2 1
-  1  1 - 1 2
-  2  1 1 - 2
-  3  1 1 2 -
-============
+======================
+     0 1 2 3 4 5 6 7 8
+  0  - 1 1 2 2 2 2 2 2
+  1  0 - 1 2 2 2 2 2 2
+  2  0 0 - 1 1 1 1 1 1
+  3  1 2 2 - 0 0 2 2 2
+  4  2 2 0 0 - 1 0 3 3
+  5  0 0 1 0 0 - 0 0 2
+  6  1 1 1 1 0 0 - 0 0
+  7  2 2 2 2 2 1 1 - 1
+  8  0 0 0 0 0 0 0 0 -
+======================
 ==================================================
 Simulation mode: trace
 ==================================================
-Trace Packet - ID: 0, Cycle: 0, Src: 0, Dst: 3, Num Deps: 0, Num Flits: 10
+Trace Packet - ID: 0, Cycle: 0, Src: 0, Dst: 3, Num Deps: 0, Num Flits: 40
 Registered Trace Packet ID: 0
 Total Trace Packets Registered: 1
 Max Cycle so far: 0
 --------------------------------------------------
-Trace Packet - ID: 1, Cycle: 1, Src: 0, Dst: 0, Num Deps: 0, Num Flits: 0
+Trace Packet - ID: 1, Cycle: 1, Src: 3, Dst: 0, Num Deps: 0, Num Flits: 0
 Registered Trace Packet ID: 1
 Total Trace Packets Registered: 2
 Max Cycle so far: 1
 --------------------------------------------------
+rc max cycle:1
 Cycle 0 Sample period 10 Trace packets left 2
 TIME 1
 TIME 2
+x_then_y 0
 TIME 3
 TIME 4
 TIME 5
-ROUTER 0 OUTPORT 1 FLIT_ID 0 PKT_ID 0 SRC 0 DST 3 NEW 1 ABSORBED 0 AGE 5 CLASS 0
+ROUTER 0 OUTPORT 2 FLIT_ID 0 PKT_ID 0 SRC 0 DST 3 NEW 1 ABSORBED 0 AGE 5 CLASS 0
 TIME 6
-ROUTER 0 OUTPORT 1 FLIT_ID 1 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 6 CLASS 0
+ROUTER 0 OUTPORT 2 FLIT_ID 1 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 6 CLASS 0
 TIME 7
-ROUTER 0 OUTPORT 1 FLIT_ID 2 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 7 CLASS 0
+x_then_y 1
 TIME 8
 TIME 9
 TIME 10
+sim_state=0
+warmup periods:0
+total_phases:0
 Warmed up ...Time used is 10 cycles
-Draining all recorded packets ...
-Draining remaining packets ...
-ROUTER 1 OUTPORT 2 FLIT_ID 0 PKT_ID 0 SRC 0 DST 3 NEW 1 ABSORBED 0 AGE 10 CLASS 0
+Cycle 0 Sample period 10 Trace packets left 2
+ROUTER 3 OUTPORT 0 FLIT_ID 0 PKT_ID 0 SRC 0 DST 3 NEW 1 ABSORBED 0 AGE 10 CLASS 0
 TIME 11
-ROUTER 1 OUTPORT 2 FLIT_ID 1 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 11 CLASS 0
+ROUTER 3 OUTPORT 0 FLIT_ID 1 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 11 CLASS 0
 TIME 12
-ROUTER 0 OUTPORT 1 FLIT_ID 3 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 12 CLASS 0
-ROUTER 1 OUTPORT 2 FLIT_ID 2 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 12 CLASS 0
+ROUTER 0 OUTPORT 2 FLIT_ID 2 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 12 CLASS 0
 TIME 13
-ROUTER 0 OUTPORT 1 FLIT_ID 4 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 13 CLASS 0
+ROUTER 0 OUTPORT 2 FLIT_ID 3 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 13 CLASS 0
 TIME 14
-ROUTER 0 OUTPORT 1 FLIT_ID 5 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 14 CLASS 0
 TIME 15
-ROUTER 3 OUTPORT 0 FLIT_ID 0 PKT_ID 0 SRC 0 DST 3 NEW 1 ABSORBED 0 AGE 15 CLASS 0
+ROUTER 3 OUTPORT 0 FLIT_ID 2 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 15 CLASS 0
 TIME 16
-ROUTER 3 OUTPORT 0 FLIT_ID 1 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 16 CLASS 0
+ROUTER 3 OUTPORT 0 FLIT_ID 3 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 16 CLASS 0
 TIME 17
-ROUTER 1 OUTPORT 2 FLIT_ID 3 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 17 CLASS 0
-ROUTER 3 OUTPORT 0 FLIT_ID 2 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 17 CLASS 0
+ROUTER 0 OUTPORT 2 FLIT_ID 4 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 17 CLASS 0
 TIME 18
-ROUTER 1 OUTPORT 2 FLIT_ID 4 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 18 CLASS 0
+ROUTER 0 OUTPORT 2 FLIT_ID 5 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 18 CLASS 0
 TIME 19
-ROUTER 0 OUTPORT 1 FLIT_ID 6 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 19 CLASS 0
-ROUTER 1 OUTPORT 2 FLIT_ID 5 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 19 CLASS 0
 TIME 20
-ROUTER 0 OUTPORT 1 FLIT_ID 7 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 20 CLASS 0
-ROUTER 3 OUTPORT 0 FLIT_ID 3 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 20 CLASS 0
+sim_state=1
+Cycle 0 Sample period 10 Trace packets left 2
+ROUTER 3 OUTPORT 0 FLIT_ID 4 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 20 CLASS 0
 TIME 21
-ROUTER 0 OUTPORT 1 FLIT_ID 8 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 21 CLASS 0
-ROUTER 3 OUTPORT 0 FLIT_ID 4 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 21 CLASS 0
+ROUTER 3 OUTPORT 0 FLIT_ID 5 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 21 CLASS 0
 TIME 22
-ROUTER 1 OUTPORT 2 FLIT_ID 6 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 22 CLASS 0
-ROUTER 3 OUTPORT 0 FLIT_ID 5 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 22 CLASS 0
+ROUTER 0 OUTPORT 2 FLIT_ID 6 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 22 CLASS 0
 TIME 23
-ROUTER 1 OUTPORT 2 FLIT_ID 7 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 23 CLASS 0
+ROUTER 0 OUTPORT 2 FLIT_ID 7 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 23 CLASS 0
 TIME 24
-ROUTER 0 OUTPORT 1 FLIT_ID 9 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 1 AGE 24 CLASS 0
-ROUTER 1 OUTPORT 2 FLIT_ID 8 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 24 CLASS 0
 TIME 25
 ROUTER 3 OUTPORT 0 FLIT_ID 6 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 25 CLASS 0
 TIME 26
 ROUTER 3 OUTPORT 0 FLIT_ID 7 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 26 CLASS 0
 TIME 27
-ROUTER 1 OUTPORT 2 FLIT_ID 9 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 1 AGE 27 CLASS 0
-ROUTER 3 OUTPORT 0 FLIT_ID 8 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 27 CLASS 0
+ROUTER 0 OUTPORT 2 FLIT_ID 8 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 27 CLASS 0
 TIME 28
+ROUTER 0 OUTPORT 2 FLIT_ID 9 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 28 CLASS 0
 TIME 29
 TIME 30
-ROUTER 3 OUTPORT 0 FLIT_ID 9 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 1 AGE 30 CLASS 0
+sim_state=1
+Cycle 0 Sample period 10 Trace packets left 2
+ROUTER 3 OUTPORT 0 FLIT_ID 8 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 30 CLASS 0
 TIME 31
+ROUTER 3 OUTPORT 0 FLIT_ID 9 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 31 CLASS 0
 TIME 32
+ROUTER 0 OUTPORT 2 FLIT_ID 10 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 32 CLASS 0
 TIME 33
+ROUTER 0 OUTPORT 2 FLIT_ID 11 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 33 CLASS 0
 TIME 34
 TIME 35
-Time taken is 35 cycles
+ROUTER 3 OUTPORT 0 FLIT_ID 10 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 35 CLASS 0
+TIME 36
+ROUTER 3 OUTPORT 0 FLIT_ID 11 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 36 CLASS 0
+TIME 37
+ROUTER 0 OUTPORT 2 FLIT_ID 12 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 37 CLASS 0
+TIME 38
+ROUTER 0 OUTPORT 2 FLIT_ID 13 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 38 CLASS 0
+TIME 39
+TIME 40
+sim_state=1
+Draining all recorded packets ...
+Draining remaining packets ...
+ROUTER 3 OUTPORT 0 FLIT_ID 12 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 40 CLASS 0
+TIME 41
+ROUTER 3 OUTPORT 0 FLIT_ID 13 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 41 CLASS 0
+TIME 42
+ROUTER 0 OUTPORT 2 FLIT_ID 14 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 42 CLASS 0
+TIME 43
+ROUTER 0 OUTPORT 2 FLIT_ID 15 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 43 CLASS 0
+TIME 44
+TIME 45
+ROUTER 3 OUTPORT 0 FLIT_ID 14 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 45 CLASS 0
+TIME 46
+ROUTER 3 OUTPORT 0 FLIT_ID 15 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 46 CLASS 0
+TIME 47
+ROUTER 0 OUTPORT 2 FLIT_ID 16 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 47 CLASS 0
+TIME 48
+ROUTER 0 OUTPORT 2 FLIT_ID 17 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 48 CLASS 0
+TIME 49
+TIME 50
+ROUTER 3 OUTPORT 0 FLIT_ID 16 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 50 CLASS 0
+TIME 51
+ROUTER 3 OUTPORT 0 FLIT_ID 17 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 51 CLASS 0
+TIME 52
+ROUTER 0 OUTPORT 2 FLIT_ID 18 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 52 CLASS 0
+TIME 53
+ROUTER 0 OUTPORT 2 FLIT_ID 19 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 53 CLASS 0
+TIME 54
+TIME 55
+ROUTER 3 OUTPORT 0 FLIT_ID 18 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 55 CLASS 0
+TIME 56
+ROUTER 3 OUTPORT 0 FLIT_ID 19 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 56 CLASS 0
+TIME 57
+ROUTER 0 OUTPORT 2 FLIT_ID 20 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 57 CLASS 0
+TIME 58
+ROUTER 0 OUTPORT 2 FLIT_ID 21 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 58 CLASS 0
+TIME 59
+TIME 60
+ROUTER 3 OUTPORT 0 FLIT_ID 20 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 60 CLASS 0
+TIME 61
+ROUTER 3 OUTPORT 0 FLIT_ID 21 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 61 CLASS 0
+TIME 62
+ROUTER 0 OUTPORT 2 FLIT_ID 22 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 62 CLASS 0
+TIME 63
+ROUTER 0 OUTPORT 2 FLIT_ID 23 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 63 CLASS 0
+TIME 64
+TIME 65
+ROUTER 3 OUTPORT 0 FLIT_ID 22 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 65 CLASS 0
+TIME 66
+ROUTER 3 OUTPORT 0 FLIT_ID 23 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 66 CLASS 0
+TIME 67
+ROUTER 0 OUTPORT 2 FLIT_ID 24 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 67 CLASS 0
+TIME 68
+ROUTER 0 OUTPORT 2 FLIT_ID 25 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 68 CLASS 0
+TIME 69
+TIME 70
+ROUTER 3 OUTPORT 0 FLIT_ID 24 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 70 CLASS 0
+TIME 71
+ROUTER 3 OUTPORT 0 FLIT_ID 25 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 71 CLASS 0
+TIME 72
+ROUTER 0 OUTPORT 2 FLIT_ID 26 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 72 CLASS 0
+TIME 73
+ROUTER 0 OUTPORT 2 FLIT_ID 27 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 73 CLASS 0
+TIME 74
+TIME 75
+ROUTER 3 OUTPORT 0 FLIT_ID 26 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 75 CLASS 0
+TIME 76
+ROUTER 3 OUTPORT 0 FLIT_ID 27 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 76 CLASS 0
+TIME 77
+ROUTER 0 OUTPORT 2 FLIT_ID 28 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 77 CLASS 0
+TIME 78
+ROUTER 0 OUTPORT 2 FLIT_ID 29 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 78 CLASS 0
+TIME 79
+TIME 80
+ROUTER 3 OUTPORT 0 FLIT_ID 28 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 80 CLASS 0
+TIME 81
+ROUTER 3 OUTPORT 0 FLIT_ID 29 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 81 CLASS 0
+TIME 82
+ROUTER 0 OUTPORT 2 FLIT_ID 30 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 82 CLASS 0
+TIME 83
+ROUTER 0 OUTPORT 2 FLIT_ID 31 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 83 CLASS 0
+TIME 84
+TIME 85
+ROUTER 3 OUTPORT 0 FLIT_ID 30 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 85 CLASS 0
+TIME 86
+ROUTER 3 OUTPORT 0 FLIT_ID 31 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 86 CLASS 0
+TIME 87
+ROUTER 0 OUTPORT 2 FLIT_ID 32 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 87 CLASS 0
+TIME 88
+ROUTER 0 OUTPORT 2 FLIT_ID 33 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 88 CLASS 0
+TIME 89
+TIME 90
+ROUTER 3 OUTPORT 0 FLIT_ID 32 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 90 CLASS 0
+TIME 91
+ROUTER 3 OUTPORT 0 FLIT_ID 33 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 91 CLASS 0
+TIME 92
+ROUTER 0 OUTPORT 2 FLIT_ID 34 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 92 CLASS 0
+TIME 93
+ROUTER 0 OUTPORT 2 FLIT_ID 35 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 93 CLASS 0
+TIME 94
+TIME 95
+ROUTER 3 OUTPORT 0 FLIT_ID 34 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 95 CLASS 0
+TIME 96
+ROUTER 3 OUTPORT 0 FLIT_ID 35 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 96 CLASS 0
+TIME 97
+ROUTER 0 OUTPORT 2 FLIT_ID 36 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 97 CLASS 0
+TIME 98
+ROUTER 0 OUTPORT 2 FLIT_ID 37 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 98 CLASS 0
+TIME 99
+TIME 100
+ROUTER 3 OUTPORT 0 FLIT_ID 36 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 100 CLASS 0
+TIME 101
+ROUTER 3 OUTPORT 0 FLIT_ID 37 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 101 CLASS 0
+TIME 102
+ROUTER 0 OUTPORT 2 FLIT_ID 38 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 102 CLASS 0
+TIME 103
+ROUTER 0 OUTPORT 2 FLIT_ID 39 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 1 AGE 103 CLASS 0
+TIME 104
+TIME 105
+ROUTER 3 OUTPORT 0 FLIT_ID 38 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 0 AGE 105 CLASS 0
+TIME 106
+ROUTER 3 OUTPORT 0 FLIT_ID 39 PKT_ID 0 SRC 0 DST -1 NEW 0 ABSORBED 1 AGE 106 CLASS 0
+TIME 107
+TIME 108
+TIME 109
+TIME 110
+TIME 111
+Time taken is 111 cycles
 ====== Overall Traffic Statistics ======
-Total run time 0.00566387
+Total run time 0.0202239
 L = 2 K = 8.1 M = 2 N = 1
 -----------------------------------------
 - OCN Power Summary
-- Completion Time:         35
+- Completion Time:         111
 - Flit Widths:            128
-- Channel Wire Power:      1.25306
-- Channel Clock Power:     0.121188
-- Channel Retiming Power:  0.0155686
-- Channel Leakage Power:   0.0456856
-- Input Read Power:        0.0335259
-- Input Write Power:       0.0335259
-- Input Leakage Power:     0.013271
-- Switch Power:            0.0528415
-- Switch Control Power:    0.0268453
-- Switch Leakage Power:    0.0301192
-- Output DFF Power:        0.00583822
-- Output Clk Power:        0.0454454
-- Output Control Power:    0.00301301
-- Total Power:             1.67993
+- Channel Wire Power:      1.18533
+- Channel Clock Power:     0.318117
+- Channel Retiming Power:  0.0147271
+- Channel Leakage Power:   0.119925
+- Input Read Power:        0.033281
+- Input Write Power:       0.033281
+- Input Leakage Power:     0.0486605
+- Switch Power:            0.0547339
+- Switch Control Power:    0.0263347
+- Switch Leakage Power:    0.123656
+- Output DFF Power:        0.00490902
+- Output Clk Power:        0.124975
+- Output Control Power:    0.00253346
+- Total Power:             2.09046
 -----------------------------------------
 
 -----------------------------------------
 - OCN Area Summary
-- Channel Area:  0.00908067
-- Switch  Area:  0.0150995
-- Input  Area:   0.0141558
-- Output  Area:  0.00125829
-- Total Area:    0.0395942
+- Channel Area:  0.0238368
+- Switch  Area:  0.0524288
+- Input  Area:   0.0519045
+- Output  Area:  0.0034603
+- Total Area:    0.13163
 -----------------------------------------

@@ -34,7 +34,7 @@ k = 8;
 n = 2;
 
 // Routing
-routing_function = dor;
+routing_function = xy_yx;
 
 // Flow control
 num_vcs     = 8;
@@ -58,11 +58,16 @@ internal_speedup  = 1.0;
 
 // Traffic
 traffic = transpose;
-packet_size = 20;
-
+packet_size = 2;
+warmup_periods =0;
 
 // Simulation
 sim_type = latency;
 
 injection_rate = 0.005;
 
+viewer_trace = 1;
+print_activity = 0;
+measure_stats = 0;
+sim_mode = trace;
+trace_file = trace_file.json;

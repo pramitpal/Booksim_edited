@@ -59,6 +59,7 @@
 #include <iostream>
 #include <iomanip>   // for setw, left
 #include <sstream>   // for ostringstream
+#include "../random_utils.hpp"
 #include "../nlohmann/json.hpp"
 using json = nlohmann::json;
 // Pramit modified ends
@@ -66,6 +67,8 @@ using json = nlohmann::json;
 map<int, int>* global_routing_table;
 // Pramit modified starts
 map<int, int>* global_custom_routing_table;
+vector<vector<map<int, int>>> routing_tables;
+vector<vector<map<int, int>>>* global_routing_tables_ptr = nullptr;
 // Pramit modified ends
 AnyNet::AnyNet( const Configuration &config, const string & name )
   :  Network( config, name ){
@@ -222,16 +225,10 @@ void AnyNet::RegisterRoutingFunctions() {
 
 void min_anynet( const Router *r, const Flit *f, int in_channel, OutputSet *outputs, bool inject ){
   int out_port=-1;
-  if(!inject){
-    // assert(global_routing_table[r->GetID()].count(f->dest)!=0);
-    // out_port=global_routing_table[r->GetID()][f->dest];
-    //Pramit modified starts
-    assert(global_custom_routing_table[r->GetID()].count(f->dest)!=0);
-    out_port=global_custom_routing_table[r->GetID()][f->dest];
-    //Pramit modified ends
-  }
  
-
+  // cout<<"inchannel "<<in_channel<<endl;
+  bool in_transit = (in_channel>0);
+  // cout<<"travelling "<< in_transit<<endl;
   int vcBegin = 0, vcEnd = gNumVCs-1;
   if ( f->type == Flit::READ_REQUEST ) {
     vcBegin = gReadReqBeginVC;
@@ -246,44 +243,92 @@ void min_anynet( const Router *r, const Flit *f, int in_channel, OutputSet *outp
     vcBegin = gWriteReplyBeginVC;
     vcEnd   = gWriteReplyEndVC;
   }
-
+  assert(((f->vc >= vcBegin) && (f->vc <= vcEnd)) || (inject && (f->vc < 0)));
+  
+  if(inject){
+      out_port=-1;
+  }
+  // else if(r->GetID() == f->dest)
+  // {
+  //   cout<<"at dest router"<<endl;
+  // }
+  else{
+    //each class must have at least 2 vcs assigned or else xy_yx will deadlock
+    int const available_vcs = (vcEnd - vcBegin + 1) / 2;
+    assert(available_vcs > 0);
+    // cout<< "available vcs "<<available_vcs<<endl;
+    bool x_then_y;
+    if(f->head)//new inject
+    {
+      x_then_y = (RandomInt(1) > 0);
+    }
+    else{
+      x_then_y=(f->vc < (vcBegin + available_vcs));
+    }
+    cout<<"x_then_y "<<x_then_y<<endl;
+    //Pramit modified starts
+    assert((*global_routing_tables_ptr)[1][r->GetID()].count(f->dest)!=0);
+    out_port=(*global_routing_tables_ptr)[1][r->GetID()][f->dest];
+  //   cout<<"outport="<<out_port<<endl;
+  // cout<<"current router:"<<r->GetID()<<" dest:"<<f->dest<<endl;
+    //Pramit modified ends
+  }
   outputs->Clear( );
-
+  
   outputs->AddRange( out_port , vcBegin, vcEnd );
 }
 ////////////////////////////////////////////////////
-void AnyNet::buildRoutingTable(const Configuration &config){
-  // cout<<"========================== Routing table  =====================\n";  
-  // routing_table.resize(_size);
-  
-  // for(int i = 0; i<_size; i++){
-  //   route(i);
-  // }
-  // global_routing_table = &routing_table[0];
-  // Pramit modified starts
-  ///////////////////////////////////////////////
-  custom_routing_table.resize(_size);
-  string file_name = config.GetStr("routing_table_file");
-  std::ifstream file(file_name);
-  if (!file.is_open()) {
-    std::cerr << "Could not open routing table file which is expected to be at " << file_name << std::endl;
-    return;
-  }
-  // Parse the JSON file
-  json jsonData;
-  file >> jsonData;
-  json table = jsonData["table"];  // or jsonData["routing_table"] for second format
-  for (auto& [src, destinations] : table.items()) {
-      for (auto& [dst, port] : destinations.items()) {
-        custom_routing_table[std::stoi(src)][std::stoi(dst)] = port.is_null() ? 0 : port.get<int>();
-      }
-  }
-  global_custom_routing_table = &custom_routing_table[0];
-  
-  // Print as matrix: rows = src, cols = dst, cell = out_port
-  PrintRoutingMatrix(custom_routing_table, "Routing_table (src \\ dst)");
-  // Pramit modified ends
+////////////////////////////////////////////////////
+void AnyNet::buildRoutingTable(const Configuration &config) {
+    string file_name = config.GetStr("routing_table_file");
+    std::ifstream file(file_name);
+    json jsonData;
+    file >> jsonData;
+    
+    // Read config if present
+    string mode = "default";
+    int num_tables = 0;
+    if(jsonData.contains("config")) {
+        mode = jsonData["config"]["mode"];
+        num_tables = jsonData["config"]["num_tables"];
+    }
+    
+    // Count tables by checking for "_table" suffix
+    vector<string> table_names;
+    for (auto it = jsonData.begin(); it != jsonData.end(); ++it) {
+        string key = it.key();
+        if(key.find("_table") != string::npos) {
+            table_names.push_back(key);
+        }
+    }
+    
+    if(num_tables == 0) num_tables = table_names.size();
+    
+    // Resize and load
+    routing_tables.resize(num_tables);
+    for(int i = 0; i < num_tables; i++) {
+        routing_tables[i].resize(_size);
+        
+        string table_name = table_names[i];
+        for (auto src_it = jsonData[table_name].begin(); 
+             src_it != jsonData[table_name].end(); ++src_it) {
+            int src = std::stoi(src_it.key());
+            for (auto dst_it = src_it.value().begin(); 
+                 dst_it != src_it.value().end(); ++dst_it) {
+                int dst = std::stoi(dst_it.key());
+                routing_tables[i][src][dst] = 
+                    dst_it.value().is_null() ? 0 : dst_it.value().get<int>();
+            }
+        }
+        cout << "Loaded: " << table_name << endl;
+    }
+    
+    global_routing_tables_ptr = &routing_tables;
+//   // Print as matrix: rows = src, cols = dst, cell = out_port
+  PrintRoutingMatrix((*global_routing_tables_ptr)[1], "Routing_table (src \\ dst)");
 }
+
+
 //Pramit modified starts
 void PrintRoutingMatrix(const std::vector<std::map<int, int>>& routing_table,
                         const std::string& title) {
