@@ -120,16 +120,38 @@ Routing_table (src \ dst)
 ==================================================
 Simulation mode: trace
 ==================================================
-Trace Packet - ID: 0, Cycle: 0, Src: 0, Dst: 3, Num Deps: 0, Num Flits: 256
+Trace Packet - ID: 0, Cycle: 0, Src: 0, Dst: 3, Num Deps: 0, Num Flits: 50
 Registered Trace Packet ID: 0
 Total Trace Packets Registered: 1
 Max Cycle so far: 0
 --------------------------------------------------
-rc max cycle:0
-Cycle 0 Sample period 10 Trace packets left 1
+Trace Packet - ID: 1, Cycle: 1, Src: 0, Dst: 3, Num Deps: 1, Num Flits: 50
+Registered Trace Packet ID: 1
+Total Trace Packets Registered: 2
+Max Cycle so far: 1
+--------------------------------------------------
+Trace Packet - ID: 2, Cycle: 2, Src: 1, Dst: 2, Num Deps: 0, Num Flits: 50
+Registered Trace Packet ID: 2
+Total Trace Packets Registered: 3
+Max Cycle so far: 2
+--------------------------------------------------
+Trace Packet - ID: 3, Cycle: 3, Src: 2, Dst: 0, Num Deps: 2, Num Flits: 50
+Registered Trace Packet ID: 3
+Total Trace Packets Registered: 4
+Max Cycle so far: 3
+--------------------------------------------------
+rc max cycle:3
+Cycle 0 Sample period 10 Trace packets left 4
 === ROUTING FUNCTION ===
 Router:  | Flit: 0 | Pkt: 0 | Head: 1 | Tail: 0
 Src: 0 | Dst: 3 | Inject: 1 | In_channel: -1 | Current VC: -1
+Action: INJECTION (out_port = -1)
+Output: port=-1 | VC range=[0, 3]
+========================
+
+=== ROUTING FUNCTION ===
+Router:  | Flit: 50 | Pkt: 2 | Head: 1 | Tail: 0
+Src: 1 | Dst: 2 | Inject: 1 | In_channel: -1 | Current VC: -1
 Action: INJECTION (out_port = -1)
 Output: port=-1 | VC range=[0, 3]
 ========================
@@ -147,52 +169,77 @@ Output: port=2 | VC range=[0, 1]
 ========================
 
 === ROUTING FUNCTION ===
+Router:  | Flit: 50 | Pkt: 2 | Head: 1 | Tail: 0
+Src: 1 | Dst: 2 | Inject: 0 | In_channel: 0 | Current VC: 0
+Available VCs per path: 2
+HEAD FLIT: Randomly selecting routing -> YX
+Table selected: 1 (YX)
+Lookup: routing_tables[1][1][2] = 2
+YX path: Using VC range [2, 3]
+VC allocation: Original [0, 3] -> Final [2, 3]
+Output: port=2 | VC range=[2, 3]
+========================
+
+=== ROUTING FUNCTION ===
 Router:  | Flit: 0 | Pkt: 0 | Head: 1 | Tail: 0
 Src: 0 | Dst: 3 | Inject: 0 | In_channel: 1 | Current VC: 0
 Available VCs per path: 2
-HEAD FLIT: Randomly selecting routing -> XY
-Table selected: 0 (XY)
-Lookup: routing_tables[0][3][3] = 0
-XY path: Using VC range [0, 1]
-VC allocation: Original [0, 3] -> Final [0, 1]
-Output: port=0 | VC range=[0, 1]
+HEAD FLIT: Randomly selecting routing -> YX
+Table selected: 1 (YX)
+Lookup: routing_tables[1][3][3] = 0
+YX path: Using VC range [2, 3]
+VC allocation: Original [0, 3] -> Final [2, 3]
+Output: port=0 | VC range=[2, 3]
+========================
+
+=== ROUTING FUNCTION ===
+Router:  | Flit: 50 | Pkt: 2 | Head: 1 | Tail: 0
+Src: 1 | Dst: 2 | Inject: 0 | In_channel: 1 | Current VC: 2
+Available VCs per path: 2
+HEAD FLIT: Randomly selecting routing -> YX
+Table selected: 1 (YX)
+Lookup: routing_tables[1][2][2] = 0
+YX path: Using VC range [2, 3]
+VC allocation: Original [0, 3] -> Final [2, 3]
+Output: port=0 | VC range=[2, 3]
 ========================
 
 sim_state=0
 warmup periods:0
 total_phases:0
 Warmed up ...Time used is 10 cycles
-Cycle 0 Sample period 10 Trace packets left 1
+Cycle 0 Sample period 10 Trace packets left 4
 sim_state=1
-Cycle 0 Sample period 10 Trace packets left 1
+Cycle 0 Sample period 10 Trace packets left 4
 sim_state=1
-Cycle 0 Sample period 10 Trace packets left 1
+Cycle 0 Sample period 10 Trace packets left 4
 sim_state=1
 Draining all recorded packets ...
 Draining remaining packets ...
 Packets left to trace: -1
-Time taken is 651 cycles
+Packets left to trace: -1
+Time taken is 138 cycles
 ====== Overall Traffic Statistics ======
-Total run time 0.00103688
+Total run time 0.000603914
 L = 2 K = 8.1 M = 2 N = 1
 -----------------------------------------
 - OCN Power Summary
-- Completion Time:         651
+- Completion Time:         138
 - Flit Widths:            128
-- Channel Wire Power:      1.29348
+- Channel Wire Power:      2.38354
 - Channel Clock Power:     0.136336
-- Channel Retiming Power:  0.0160708
+- Channel Retiming Power:  0.0296142
 - Channel Leakage Power:   0.0513962
-- Input Read Power:        0.0363177
-- Input Write Power:       0.0363177
+- Input Read Power:        0.0669237
+- Input Write Power:       0.0669237
 - Input Leakage Power:     0.0206438
-- Switch Power:            0.0597281
-- Switch Control Power:    0.0287376
+- Switch Power:            0.112934
+- Switch Control Power:    0.0529557
 - Switch Leakage Power:    0.0471868
-- Output DFF Power:        0.00535694
+- Output DFF Power:        0.00987139
 - Output Clk Power:        0.0530196
-- Output Control Power:    0.00276462
-- Total Power:             1.78736
+- Output Control Power:    0.00509446
+- Total Power:             3.03644
 -----------------------------------------
 
 -----------------------------------------
