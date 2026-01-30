@@ -241,7 +241,7 @@ TIME 31
 TIME 32
 Time taken is 32 cycles
 ====== Overall Traffic Statistics ======
-Total run time 0.000358105
+Total run time 0.00689888
 L = 2 K = 8.1 M = 2 N = 1
 -----------------------------------------
 - OCN Power Summary

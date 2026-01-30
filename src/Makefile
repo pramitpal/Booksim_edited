@@ -33,7 +33,7 @@ CPPFLAGS += -O3
 CPPFLAGS += -g
 LFLAGS +=
 
-PROG := booksim
+PROG := booksim_new
 
 # simulator source files
 CPP_SRCS = $(wildcard *.cpp) $(wildcard */*.cpp)
