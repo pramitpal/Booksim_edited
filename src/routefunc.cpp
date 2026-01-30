@@ -196,6 +196,7 @@ void tree4_anca( const Router *r, const Flit *f,
 void tree4_nca( const Router *r, const Flit *f,
 		int in_channel, OutputSet* outputs, bool inject)
 {
+  // cout << "In tree4_nca" << endl;
   int vcBegin = 0, vcEnd = gNumVCs-1;
   if ( f->type == Flit::READ_REQUEST ) {
     vcBegin = gReadReqBeginVC;
@@ -243,8 +244,8 @@ void tree4_nca( const Router *r, const Flit *f,
 	out_port = gK + RandomInt(1);
     }
     
-    //  cout << "Router("<<rH<<","<<rP<<"): id= " << f->id << " dest= " << f->dest << " out_port = "
-    //       << out_port << endl;
+     cout << "Router("<<rH<<","<<rP<<"): id= " << f->id << " dest= " << f->dest << " out_port = "
+          << out_port << endl;
 
   }
 

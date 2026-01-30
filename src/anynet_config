@@ -1,7 +1,7 @@
 topology = anynet;
 
 
-routing_function = min;
+routing_function = nca;
 network_file = anynet_file;
 traffic = uniform;
 
@@ -21,7 +21,7 @@ vc_allocator = separable_input_first;
 sw_allocator = separable_input_first;
 alloc_iters  = 1;
 
-sample_period = 10;
+sample_period = 5;
 warmup_periods = 0;
 max_samples = 150;
 
@@ -43,7 +43,7 @@ channel_width = 128;
 sim_mode = trace;
 trace_file = trace_file.json;
 routing_table_file = routing_table.json;
-viewer_trace = 0;
+viewer_trace = 1;
 print_csv_results = 0;
 print_activity = 0;
 measure_stats = 0;

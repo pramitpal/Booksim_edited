@@ -3,36 +3,18 @@
     "id": 0,
     "cycle": 0,
     "src": 0,
-    "dst": 3,
+    "dst": 1,
     "num_deps": 0,
-    "num_flits": 50,
+    "num_flits": 2,
     "rev_deps": []
   },
   {
     "id": 1,
     "cycle": 1,
-    "src": 0,
-    "dst": 3,
-    "num_deps": 1,
-    "num_flits": 50,
-    "rev_deps": [0]
-  },
-  {
-    "id": 2,
-    "cycle": 2,
     "src": 1,
     "dst": 2,
     "num_deps": 0,
-    "num_flits": 50,
+    "num_flits": 2,
     "rev_deps": []
-  },
-  {
-    "id": 3,
-    "cycle": 3,
-    "src": 2,
-    "dst": 0,
-    "num_deps": 2,
-    "num_flits": 50,
-    "rev_deps": [1,2]
   }
 ]

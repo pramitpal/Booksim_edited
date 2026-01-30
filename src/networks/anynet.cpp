@@ -221,6 +221,7 @@ void AnyNet::_BuildNet( const Configuration &config ){
 
 void AnyNet::RegisterRoutingFunctions() {
   gRoutingFunctionMap["min_anynet"] = &min_anynet;
+  gRoutingFunctionMap["nca_anynet"] = &nca_anynet;
 }
 
 void min_anynet( const Router *r, const Flit *f, int in_channel, OutputSet *outputs, bool inject ){
@@ -308,60 +309,43 @@ void min_anynet( const Router *r, const Flit *f, int in_channel, OutputSet *outp
   outputs->AddRange(out_port, vcBegin, vcEnd);
 }
 
-// void min_anynet( const Router *r, const Flit *f, int in_channel, OutputSet *outputs, bool inject ){
-//   int out_port=-1;
+void nca_anynet( const Router *r, const Flit *f, int in_channel, OutputSet *outputs, bool inject ){
+  int out_port=-1;
  
-//   // cout<<"inchannel "<<in_channel<<endl;
-//   bool in_transit = (in_channel>0);
-//   // cout<<"travelling "<< in_transit<<endl;
-//   int vcBegin = 0, vcEnd = gNumVCs-1;
-//   if ( f->type == Flit::READ_REQUEST ) {
-//     vcBegin = gReadReqBeginVC;
-//     vcEnd   = gReadReqEndVC;
-//   } else if ( f->type == Flit::WRITE_REQUEST ) {
-//     vcBegin = gWriteReqBeginVC;
-//     vcEnd   = gWriteReqEndVC;
-//   } else if ( f->type ==  Flit::READ_REPLY ) {
-//     vcBegin = gReadReplyBeginVC;
-//     vcEnd   = gReadReplyEndVC;
-//   } else if ( f->type ==  Flit::WRITE_REPLY ) {
-//     vcBegin = gWriteReplyBeginVC;
-//     vcEnd   = gWriteReplyEndVC;
-//   }
-//   assert(((f->vc >= vcBegin) && (f->vc <= vcEnd)) || (inject && (f->vc < 0)));
+  // cout<<"inchannel "<<in_channel<<endl;
+  // bool in_transit = (in_channel>0);
+  // cout<<"travelling "<< in_transit<<endl;
+  int vcBegin = 0, vcEnd = gNumVCs-1;
+  if ( f->type == Flit::READ_REQUEST ) {
+    vcBegin = gReadReqBeginVC;
+    vcEnd   = gReadReqEndVC;
+  } else if ( f->type == Flit::WRITE_REQUEST ) {
+    vcBegin = gWriteReqBeginVC;
+    vcEnd   = gWriteReqEndVC;
+  } else if ( f->type ==  Flit::READ_REPLY ) {
+    vcBegin = gReadReplyBeginVC;
+    vcEnd   = gReadReplyEndVC;
+  } else if ( f->type ==  Flit::WRITE_REPLY ) {
+    vcBegin = gWriteReplyBeginVC;
+    vcEnd   = gWriteReplyEndVC;
+  }
+  assert(((f->vc >= vcBegin) && (f->vc <= vcEnd)) || (inject && (f->vc < 0)));
   
-//   if(inject){
-//       out_port=-1;
-//   }
-//   // else if(r->GetID() == f->dest)
-//   // {
-//   //   cout<<"at dest router"<<endl;
-//   // }
-//   else{
-//     //each class must have at least 2 vcs assigned or else xy_yx will deadlock
-//     int const available_vcs = (vcEnd - vcBegin + 1) / 2;
-//     assert(available_vcs > 0);
-//     // cout<< "available vcs "<<available_vcs<<endl;
-//     bool x_then_y;
-//     if(f->head)//new inject
-//     {
-//       x_then_y = (RandomInt(1) > 0);
-//     }
-//     else{
-//       x_then_y=(f->vc < (vcBegin + available_vcs));
-//     }
-//     cout<<"x_then_y "<<x_then_y<<endl;
-//     //Pramit modified starts
-//     assert((*global_routing_tables_ptr)[0][r->GetID()].count(f->dest)!=0);
-//     out_port=(*global_routing_tables_ptr)[0][r->GetID()][f->dest];
-//   //   cout<<"outport="<<out_port<<endl;
-//   // cout<<"current router:"<<r->GetID()<<" dest:"<<f->dest<<endl;
-//     //Pramit modified ends
-//   }
-//   outputs->Clear( );
-  
-//   outputs->AddRange( out_port , vcBegin, vcEnd );
-// }
+  if(inject){
+    cout<<"injection"<<endl;
+      out_port=-1;
+  }
+  else{
+    //Pramit modified starts
+    assert((*global_routing_tables_ptr)[0][r->GetID()].count(f->dest)!=0);
+    out_port=(*global_routing_tables_ptr)[0][r->GetID()][f->dest];
+    cout<<"outport="<<out_port<<endl;
+  cout<<"current router:"<<r->GetID()<<" dest:"<<f->dest<<endl;
+    //Pramit modified ends
+  }
+  outputs->Clear( );
+  outputs->AddRange( out_port , vcBegin, vcEnd );
+}
 ////////////////////////////////////////////////////
 ////////////////////////////////////////////////////
 void AnyNet::buildRoutingTable(const Configuration &config) {
