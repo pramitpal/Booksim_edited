@@ -7,14 +7,5 @@
     "num_deps": 0,
     "num_flits": 2,
     "rev_deps": []
-  },
-  {
-    "id": 1,
-    "cycle": 1,
-    "src": 1,
-    "dst": 2,
-    "num_deps": 0,
-    "num_flits": 2,
-    "rev_deps": []
   }
 ]
